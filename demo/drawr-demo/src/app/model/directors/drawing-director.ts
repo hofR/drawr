@@ -7,13 +7,14 @@ import { Drawer } from '../drawers/drawer';
 export abstract class DrawingDirector<DrawerType extends Drawer<Shape>> {
   protected isDraw = false;
   protected newAnnotation?: Shape;
+  private isSetup = false;
 
   constructor(
     protected readonly stage: Konva.Stage,
     protected readonly layer: Konva.Layer,
     protected readonly drawer: DrawerType
   ) {
-    this.addEventListeners();
+    this.setup();
   }
 
   protected handleMouseDown(mouseEvent: KonvaEventObject<MouseEvent>) {
@@ -31,11 +32,22 @@ export abstract class DrawingDirector<DrawerType extends Drawer<Shape>> {
     this.stage.on('mousedown', (event) => this.handleMouseDown(event));
   }
 
-  public activate() {
+  /**
+   * Set up all necessary resources, i.e. event listeners
+   */
+  public setup() {
+    if (this.isSetup) {
+      return;
+    }
+
     this.addEventListeners();
   }
 
+  /**
+   * Dispose the object, i.e. removes active event listeners or resources
+   */
   public dispose() {
     this.stage.removeEventListener('mousedown');
+    this.isSetup = false;
   }
 }

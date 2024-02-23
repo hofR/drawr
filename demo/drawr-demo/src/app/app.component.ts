@@ -35,4 +35,12 @@ export class AppComponent implements OnInit {
   enableDrag() {
     this.editor?.enableDrag();
   }
+
+  enableSelect() {
+    this.editor?.enableSelection();
+  }
+
+  disableSelect() {
+    this.editor?.disableSelection();
+  }
 }
