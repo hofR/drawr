@@ -31,6 +31,10 @@ export abstract class DrawingDirector<DrawerType extends Drawer<Shape>> {
     this.stage.on('mousedown', (event) => this.handleMouseDown(event));
   }
 
+  public activate() {
+    this.addEventListeners();
+  }
+
   public dispose() {
     this.stage.removeEventListener('mousedown');
   }

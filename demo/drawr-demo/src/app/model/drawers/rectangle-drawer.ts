@@ -15,8 +15,7 @@ export class RectangleDrawer extends MoveDrawer<Konva.Rect> {
       y: y,
       fill: '#00D2FF',
       stroke: 'black',
-      strokeWidth: 4,
-      draggable: true,
+      strokeWidth: 4
     });
   }
 

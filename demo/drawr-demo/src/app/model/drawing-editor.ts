@@ -55,6 +55,20 @@ export class DrawingEditor {
     this.director = this.createDirector(drawer);
   }
 
+  public enableDrag(): void {
+    this.director.dispose();
+    this.layer.getChildren().forEach(shape => {
+        shape.draggable(true);
+    });
+  }
+
+  public disableDrag(): void {
+    this.director.activate();
+    this.layer.getChildren().forEach(shape => {
+        shape.draggable(false);
+    });
+  }
+
   private createDirector(drawer: Drawer<Konva.Shape>): DrawingDirector<Drawer<Konva.Shape>> {
     if (DrawingType.CLICK === drawer.drawingType) {
       return new ClickDrawingDirector(

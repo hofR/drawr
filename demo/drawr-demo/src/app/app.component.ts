@@ -27,4 +27,12 @@ export class AppComponent implements OnInit {
   changeTool(type: DrawingMode) {
     this.editor?.changeTool(type);
   }
+
+  disableDrag() {
+    this.editor?.disableDrag();
+  }
+
+  enableDrag() {
+    this.editor?.enableDrag();
+  }
 }
