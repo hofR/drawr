@@ -10,9 +10,14 @@ export interface IDrawer<T extends Konva.Shape> {
 
 export abstract class Drawer<T extends Konva.Shape> implements IDrawer<T> {
   abstract drawingType: DrawingType;
+  private static id: number = 0;
 
   constructor(protected readonly config: ShapeConfig) {}
 
   abstract create(x: number, y: number): T;
   abstract resize(object: T, x: number, y: number): void;
+  
+  protected getId(): string {
+    return `drawr-${Drawer.id++}`;
+  }
 }

@@ -24,6 +24,7 @@ export class PolygonDrawer extends ClickDrawer<Konva.Line> {
       fill: this.config.fill,
       stroke: this.config.stroke,
       strokeWidth: this.config.strokeWidth,
+      id: this.getId(),
     });
   }
 

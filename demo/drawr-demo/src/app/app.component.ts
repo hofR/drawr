@@ -12,7 +12,6 @@ import { DrawingMode } from './model/drawing-mode';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-
   title = 'drawr-demo';
   editor?: DrawingEditor;
   DrawerType = DrawingMode;
@@ -53,5 +52,9 @@ export class AppComponent implements OnInit {
   onColorChanged(event: Event) {
     const color = (event.target as HTMLInputElement).value;
     this.editor?.changeFill(color);
+  }
+
+  onDelete() {
+    this.editor?.deleteSelected();
   }
 }

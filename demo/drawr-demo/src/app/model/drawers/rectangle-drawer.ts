@@ -20,7 +20,8 @@ export class RectangleDrawer extends MoveDrawer<Konva.Rect> {
       y: y,
       fill: this.config.fill,
       stroke: this.config.stroke,
-      strokeWidth: this.config.strokeWidth
+      strokeWidth: this.config.strokeWidth,
+      id: this.getId()
     });
   }
 

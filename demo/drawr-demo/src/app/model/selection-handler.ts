@@ -4,6 +4,8 @@ import Konva from 'konva';
  * Stolen from https://konvajs.org/docs/select_and_transform/Basic_demo.html
  */
 export class SelectionHandler {
+    onSelect?: (ids: string[]) => void; 
+
     private selecting = false;
     private readonly selectionRectangle = new Konva.Rect({
         fill: 'rgba(0,0,255,0.5)',
@@ -48,6 +50,15 @@ export class SelectionHandler {
         this.stage.on('mousemove touchmove', (event) => this.handleMouseMove(event));
         this.stage.on('mouseup touchend', (event) => this.handleMouseUp(event));
         this.stage.on('click tap', (event) => this.handleClick(event));
+    }
+
+    public updateSelection(nodes: Konva.Node[]): string[] {
+        this.transformer.nodes(nodes);
+        return this.getSelectedIds();
+    }
+
+    public getSelectedIds(): string[] {
+        return this.transformer.nodes().map((node) => node.id());
     }
 
     protected handleMouseDown(mouseEvent: Konva.KonvaEventObject<MouseEvent>): void {
@@ -133,6 +144,10 @@ export class SelectionHandler {
             // add the node into selection
             const nodes = this.transformer.nodes().concat([mouseEvent.target]);
             this.transformer.nodes(nodes);
+        }
+
+        if(this.onSelect) {
+            this.onSelect(this.getSelectedIds());
         }
     }
 }

@@ -19,7 +19,8 @@ export class PolyLineDrawer extends MoveDrawer<Konva.Line> {
       points: [x, y],
       fill: this.config.fill,
       stroke: this.config.stroke,
-      strokeWidth: this.config.strokeWidth
+      strokeWidth: this.config.strokeWidth,
+      id: this.getId()
     });
   }
 

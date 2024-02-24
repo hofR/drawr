@@ -15,6 +15,8 @@ import { ShapeConfig } from "./shape-config";
 
 
 export class DrawingEditor {
+    selectedIds: string[] = [];
+
     private readonly stage: Konva.Stage;
     private readonly layer: Konva.Layer;
     private readonly selectionHandler?: SelectionHandler;
@@ -51,6 +53,9 @@ export class DrawingEditor {
         this.stage.add(this.layer);
 
         this.selectionHandler = new SelectionHandler(this.stage, this.layer);
+        this.selectionHandler.onSelect = (selected) => {
+            this.selectedIds = selected;
+        }
 
         this.director = new MoveDrawingDirector(
             this.stage,
@@ -101,6 +106,23 @@ export class DrawingEditor {
 
     public changeStroke(color: string): void {
         this.shapeConfig.stroke = color;
+    }
+
+    public deleteSelected() {
+        this.findById(this.selectedIds)
+            .forEach((node) => node.destroy());
+
+        this.selectedIds = this.selectionHandler?.updateSelection([]) ?? []
+    }
+
+    private findById(ids: string[]): Konva.Shape[] {
+        return this.layer.find((node: Konva.Node) => ids.includes(node.id()));
+    }
+
+    public removeByNames(names: string[]): void {
+        this.layer
+            .find((node: Konva.Node) => names.includes(node.name()))
+            .forEach((node) => node.destroy());
     }
 
     private createDirector(drawer: Drawer<Konva.Shape>): DrawingDirector<Drawer<Konva.Shape>> {
