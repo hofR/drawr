@@ -17,8 +17,6 @@ export class SelectionHandler {
     private y1?: number;
     private y2?: number;
 
-
-
     constructor(
         private readonly stage: Konva.Stage,
         private readonly layer: Konva.Layer

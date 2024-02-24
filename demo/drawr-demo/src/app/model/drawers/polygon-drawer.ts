@@ -1,10 +1,15 @@
 import Konva from "konva";
 import { DrawingMode } from '../drawing-mode';
 import { ClickDrawer } from './click-drawer';
+import { ShapeConfig } from "../shape-config";
 
 
 export class PolygonDrawer extends ClickDrawer<Konva.Line> {
   drawingMode = DrawingMode.POLYGON;
+
+  constructor(config: ShapeConfig) {
+    super(config);
+  }
 
   finalize(line: Konva.Line): void {
     line.closed(true);
@@ -12,13 +17,13 @@ export class PolygonDrawer extends ClickDrawer<Konva.Line> {
 
   create(
     x: number,
-    y: number
+    y: number,
   ): Konva.Line {
     return new Konva.Line({
       points: [x, y],
-      fill: '#00D2FF',
-      stroke: 'black',
-      strokeWidth: 5,
+      fill: this.config.fill,
+      stroke: this.config.stroke,
+      strokeWidth: this.config.strokeWidth,
     });
   }
 

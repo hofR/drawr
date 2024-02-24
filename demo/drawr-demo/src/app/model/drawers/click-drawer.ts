@@ -1,18 +1,23 @@
 import Konva from "konva";
 import { DrawingType } from '../drawing-type';
 import { DrawingMode } from '../drawing-mode';
-import { Drawer } from './drawer';
+import { Drawer, IDrawer } from './drawer';
+import { ShapeConfig } from "../shape-config";
 
 
-export interface IClickDrawer<T extends Konva.Shape> extends Drawer<T> {
+export interface IClickDrawer<T extends Konva.Shape> extends IDrawer<T> {
   finalize(object: T): void;
 }
-export abstract class ClickDrawer<T extends Konva.Shape> implements IClickDrawer<T> {
+
+export abstract class ClickDrawer<T extends Konva.Shape> extends Drawer<T> implements IClickDrawer<T> {
   drawingType = DrawingType.CLICK;
   abstract drawingMode?: DrawingMode;
 
+  constructor(config: ShapeConfig) {
+    super(config);
+  }
 
-  abstract create(x: number, y: number): T;
-  abstract resize(object: T, x: number, y: number): void;
+  abstract override create(x: number, y: number): T;
+  abstract override resize(object: T, x: number, y: number): void;
   abstract finalize(object: T): void;
 }

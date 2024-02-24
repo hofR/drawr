@@ -1,21 +1,26 @@
 import Konva from "konva";
 import { DrawingMode } from '../drawing-mode';
 import { MoveDrawer } from './move-drawer';
+import { ShapeConfig } from "../shape-config";
 
 
 export class RectangleDrawer extends MoveDrawer<Konva.Rect> {
   drawingMode = DrawingMode.RECTANGLE;
 
+  constructor(config: ShapeConfig) {
+    super(config);
+  }
+
   create(
     x: number,
-    y: number
+    y: number,
   ): Konva.Rect {
     return new Konva.Rect({
       x: x,
       y: y,
-      fill: '#00D2FF',
-      stroke: 'black',
-      strokeWidth: 4
+      fill: this.config.fill,
+      stroke: this.config.stroke,
+      strokeWidth: this.config.strokeWidth
     });
   }
 

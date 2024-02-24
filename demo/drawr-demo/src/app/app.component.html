@@ -9,6 +9,17 @@
 <button (click)="enableSelect()">SELECT</button>
 <button (click)="disableSelect()">NO SELECT</button>
 
+<div>
+    <label>Stroke-Color</label>
+    <input type="color"  (change)="onStrokeChanged($event)">
+</div>
+
+<div>
+    <label>Color</label>
+    <input type="color" (change)="onColorChanged($event)">
+</div>
+
+
 <div id="container"></div>
 
 <router-outlet></router-outlet>

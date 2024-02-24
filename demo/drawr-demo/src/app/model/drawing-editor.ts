@@ -5,12 +5,13 @@ import { DrawingMode } from './drawing-mode';
 import { ClickDrawingDirector } from './directors/click-drawing-director';
 import { DrawingDirector } from './directors/drawing-director';
 import { MoveDrawingDirector } from './directors/move-drawing-director';
-import { IClickDrawer } from './drawers/click-drawer';
+import { ClickDrawer } from './drawers/click-drawer';
 import { Drawer } from './drawers/drawer';
 import { PolygonDrawer } from './drawers/polygon-drawer';
 import { PolyLineDrawer } from './drawers/polyline-drawer';
 import { RectangleDrawer } from './drawers/rectangle-drawer';
 import { SelectionHandler } from "./selection-handler";
+import { ShapeConfig } from "./shape-config";
 
 
 export class DrawingEditor {
@@ -23,10 +24,15 @@ export class DrawingEditor {
     private isSelectActive = false;
     private isDragActive = false;
 
+    private shapeConfig: ShapeConfig = {
+        stroke: 'black',
+        fill: '#00D2FF',
+        strokeWidth: 4,
+    };
     private readonly drawers = [
-        new RectangleDrawer(),
-        new PolygonDrawer(),
-        new PolyLineDrawer()
+        new RectangleDrawer(this.shapeConfig),
+        new PolygonDrawer(this.shapeConfig),
+        new PolyLineDrawer(this.shapeConfig)
     ];
 
     constructor(
@@ -49,7 +55,7 @@ export class DrawingEditor {
         this.director = new MoveDrawingDirector(
             this.stage,
             this.layer,
-            new RectangleDrawer()
+            new RectangleDrawer(this.shapeConfig)
         );
     }
 
@@ -89,12 +95,20 @@ export class DrawingEditor {
         });
     }
 
+    public changeFill(color: string): void {
+        this.shapeConfig.fill = color;
+    }
+
+    public changeStroke(color: string): void {
+        this.shapeConfig.stroke = color;
+    }
+
     private createDirector(drawer: Drawer<Konva.Shape>): DrawingDirector<Drawer<Konva.Shape>> {
         if (DrawingType.CLICK === drawer.drawingType) {
             return new ClickDrawingDirector(
                 this.stage,
                 this.layer,
-                drawer as IClickDrawer<Konva.Shape>
+                drawer as ClickDrawer<Konva.Shape>
             );
         } else if (DrawingType.MOVE === drawer.drawingType) {
             return new MoveDrawingDirector(
