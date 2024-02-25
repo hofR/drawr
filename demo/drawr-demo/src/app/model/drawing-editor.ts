@@ -7,15 +7,12 @@ import { DrawingDirector } from './directors/drawing-director';
 import { MoveDrawingDirector } from './directors/move-drawing-director';
 import { ClickDrawer } from './drawers/click-drawer';
 import { Drawer } from './drawers/drawer';
-import { PolygonDrawer } from './drawers/polygon-drawer';
-import { PolyLineDrawer } from './drawers/polyline-drawer';
-import { RectangleDrawer } from './drawers/rectangle-drawer';
+import { PolygonDrawer } from './shapes/polygon/polygon-drawer';
+import { PolyLineDrawer } from './shapes/line/polyline-drawer';
+import { RectangleDrawer } from './shapes/rectangle/rectangle-drawer';
 import { SelectionHandler } from "./selection-handler";
 import { StateManager } from "./state-manager";
-import { Shape } from "./shapes/shape";
-import { RectangleFactory } from "./shapes/rectangle/rectangle-factory";
-import { ShapeFactory } from "./shapes/shape-factory";
-import { ShapeConfig, ShapeType, LineFactory, PolygonFactory} from "./shapes";
+import { Shape, RectangleFactory, ShapeConfig, ShapeType, LineFactory, PolygonFactory, ShapeFactory } from "./shapes";
 
 export class DrawingEditor {
     selectedIds: string[] = [];
@@ -191,7 +188,7 @@ export class DrawingEditor {
 
         konvaShapes.forEach((shape) => {
             this.layer.add(shape);
-        });        
+        });
     }
 
     /**

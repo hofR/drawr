@@ -1,6 +1,6 @@
 import Konva from "konva";
-import { MoveDrawer } from './move-drawer';
-import { Rectangle, RectangleFactory, ShapeConfig } from "../shapes";
+import { MoveDrawer } from '../../drawers/move-drawer';
+import { Rectangle, RectangleFactory, ShapeConfig } from "..";
 
 export class RectangleDrawer extends MoveDrawer<Konva.Rect, Rectangle> {
 

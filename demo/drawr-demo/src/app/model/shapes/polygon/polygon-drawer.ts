@@ -1,19 +1,21 @@
 import Konva from "konva";
-import { MoveDrawer } from './move-drawer';
-import { ShapeConfig } from "../shapes/shape";
-import { Line, LineFactory } from "../shapes";
+import { ClickDrawer } from '../../drawers/click-drawer';
+import { ShapeConfig } from "../shape";
+import { Polygon, PolygonFactory } from "..";
 
-export class PolyLineDrawer extends MoveDrawer<Konva.Line, Line> {
 
-  constructor(factory: LineFactory) {
+export class PolygonDrawer extends ClickDrawer<Konva.Line, Polygon> {
+
+  constructor(factory: PolygonFactory) {
     super(factory);
   }
 
   create(
     x: number,
     y: number,
-    config: ShapeConfig
-  ): Konva.Line {
+    config: ShapeConfig,
+  ): Konva.Line 
+  {
     return this.factory.toKonva({
       points: [x, y],
       fill: config.fill,
@@ -25,5 +27,9 @@ export class PolyLineDrawer extends MoveDrawer<Konva.Line, Line> {
   resize(rect: Konva.Line, x: number, y: number): void {
     const newPoints = rect.points().concat(x, y);
     rect.points(newPoints);
+  }
+
+  finalize(line: Konva.Line): void {
+    line.closed(true);
   }
 }
