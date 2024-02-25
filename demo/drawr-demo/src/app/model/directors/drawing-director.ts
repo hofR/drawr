@@ -17,6 +17,8 @@ export abstract class DrawingDirector<DrawerType extends Drawer<Shape>> {
     this.setup();
   }
 
+  onFinished?: (shape: Shape) => void;
+
   protected handleMouseDown(mouseEvent: KonvaEventObject<MouseEvent>) {
     this.isDraw = true;
 
@@ -30,6 +32,14 @@ export abstract class DrawingDirector<DrawerType extends Drawer<Shape>> {
 
   protected addEventListeners() {
     this.stage.on('mousedown', (event) => this.handleMouseDown(event));
+  }
+
+  protected finish() {
+    this.isDraw = false;
+
+    if(this.onFinished && this.newAnnotation) {
+      this.onFinished(this.newAnnotation);
+    }
   }
 
   /**

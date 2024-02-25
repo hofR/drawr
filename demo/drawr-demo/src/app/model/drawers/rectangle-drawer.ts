@@ -3,7 +3,6 @@ import { DrawingMode } from '../drawing-mode';
 import { MoveDrawer } from './move-drawer';
 import { ShapeConfig } from "../shape-config";
 
-
 export class RectangleDrawer extends MoveDrawer<Konva.Rect> {
   drawingMode = DrawingMode.RECTANGLE;
 

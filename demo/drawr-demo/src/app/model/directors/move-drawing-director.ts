@@ -16,7 +16,7 @@ export class MoveDrawingDirector<DrawerType extends MoveDrawer<Shape>> extends D
   }
 
   handleMouseUp(mouseEvent: KonvaEventObject<MouseEvent>) {
-    this.isDraw = false;
+      super.finish();
   }
 
   handleMouseMove(mouseEvent: KonvaEventObject<MouseEvent>) {

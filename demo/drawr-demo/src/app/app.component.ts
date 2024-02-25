@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { DrawingEditor } from './model/drawing-editor';
 import { DrawingMode } from './model/drawing-mode';
+import { Shape } from './model/shapes/shape';
 
 @Component({
   selector: 'app-root',
@@ -12,9 +13,11 @@ import { DrawingMode } from './model/drawing-mode';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+
   title = 'drawr-demo';
   editor?: DrawingEditor;
   DrawerType = DrawingMode;
+  shapes?: Shape[];
 
   ngOnInit(): void {
     this.initKonva()
@@ -56,5 +59,21 @@ export class AppComponent implements OnInit {
 
   onDelete() {
     this.editor?.deleteSelected();
+  }
+
+  export() {
+    this.shapes = this.editor?.export();
+ }
+
+  import() {
+    this.editor?.import(this.shapes ?? []);
+  }
+
+  undo() {
+    this.editor?.undo();
+  }
+
+  redo() {
+    this.editor?.redo();
   }
 }

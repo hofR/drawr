@@ -11,6 +11,12 @@
 
 <button (click)="onDelete()">DELETE</button>
 
+<button (click)="export()">EXPORT</button>
+<button (click)="import()">IMPORT</button>
+
+<button (click)="undo()">UNDO</button>
+<button (click)="redo()">REDO</button>
+
 <div>
     <label>Stroke-Color</label>
     <input type="color"  (change)="onStrokeChanged($event)">

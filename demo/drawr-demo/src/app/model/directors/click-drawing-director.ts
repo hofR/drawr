@@ -40,9 +40,9 @@ export class ClickDrawingDirector<DrawerType extends ClickDrawer<Shape>> extends
 
     container.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
-        this.isDraw = false;
         this.initalMouseDownHandled = false;
         (this.drawer as IClickDrawer<any>).finalize(this.newAnnotation);
+        this.finish();
       }
       else {
         return;

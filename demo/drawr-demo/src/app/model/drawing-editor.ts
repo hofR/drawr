@@ -12,6 +12,9 @@ import { PolyLineDrawer } from './drawers/polyline-drawer';
 import { RectangleDrawer } from './drawers/rectangle-drawer';
 import { SelectionHandler } from "./selection-handler";
 import { ShapeConfig } from "./shape-config";
+import { Rectangle, fromShape, toKonvaRect } from "./shapes/rectangle";
+import { StateManager } from "./state-manager";
+import { Shape } from "./shapes/shape";
 
 
 export class DrawingEditor {
@@ -20,6 +23,7 @@ export class DrawingEditor {
     private readonly stage: Konva.Stage;
     private readonly layer: Konva.Layer;
     private readonly selectionHandler?: SelectionHandler;
+    private readonly stateManager: StateManager;
 
     private director: DrawingDirector<Drawer<Konva.Shape>>;
 
@@ -62,6 +66,8 @@ export class DrawingEditor {
             this.layer,
             new RectangleDrawer(this.shapeConfig)
         );
+
+        this.stateManager = new StateManager();
     }
 
     public changeTool(type: DrawingMode): void {
@@ -125,21 +131,57 @@ export class DrawingEditor {
             .forEach((node) => node.destroy());
     }
 
+    public export(): Rectangle[] {
+        const rectangles = this.layer.find('Rect');
+        return rectangles.map((node: Konva.Node) => fromShape(node as Konva.Shape));
+    }
+
+    public import(shapes: Shape[]): void {
+        this.layer.removeChildren();
+        const konvaShapes = shapes.map((shape: Shape) => toKonvaRect(shape as Rectangle));
+        konvaShapes.forEach((shape) => {
+            this.layer.add(shape);
+        });
+    }
+
+    public undo(): void {
+        const newState = this.stateManager?.undo();
+        if (newState) {
+            this.import(newState);
+        }
+    }
+
+    public redo(): void {
+        const newState = this.stateManager?.redo();
+        if (newState) {
+            this.import(newState);
+        }
+    }
+
     private createDirector(drawer: Drawer<Konva.Shape>): DrawingDirector<Drawer<Konva.Shape>> {
+        let director = undefined;
+
         if (DrawingType.CLICK === drawer.drawingType) {
-            return new ClickDrawingDirector(
+            director = new ClickDrawingDirector(
                 this.stage,
                 this.layer,
                 drawer as ClickDrawer<Konva.Shape>
             );
         } else if (DrawingType.MOVE === drawer.drawingType) {
-            return new MoveDrawingDirector(
+            director = new MoveDrawingDirector(
                 this.stage,
                 this.layer,
                 drawer
             );
+        } else {
+            throw new Error(`${drawer.drawingType} is unkown!`);
         }
 
-        throw new Error(`${drawer.drawingType} is unkown!`);
+        director.onFinished = (shape: Konva.Shape) => this.onShapeCreated(shape);
+        return director;
+    }
+
+    private onShapeCreated(shape: Konva.Shape) {
+        this.stateManager?.save(this.export());
     }
 }
