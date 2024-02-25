@@ -210,6 +210,14 @@ export class DrawingEditor {
     }
 
     /**
+     * 
+     * @returns true if an action can be undone
+     */
+    public canUndo(): boolean {
+        return this.stateManager?.canUndo();
+    }
+
+    /**
      * Redo the last undone action
      */
     public redo(): void {
@@ -217,6 +225,14 @@ export class DrawingEditor {
         if (newState) {
             this.import(newState);
         }
+    }
+
+    /**
+     * 
+     * @returns true if an action can be redone
+     */
+    public canRedo(): boolean {
+        return this.stateManager?.canRedo();
     }
 
     private findAll(): Konva.Shape[] {

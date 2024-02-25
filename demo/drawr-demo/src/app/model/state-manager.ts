@@ -8,6 +8,14 @@ export class StateManager {
 
     constructor() { }
 
+    /**
+     * Save an array of shapes as new state
+     * 
+     * - Drops the oldest state if limit is reached
+     * - Resets the redo stack
+     * 
+     * @param state Array of shapes that represent the state
+     */
     save(state: Shape[]): void {
         if (this.stateStack.length === this.maxCount) {
             //Drop the oldest element
@@ -25,11 +33,15 @@ export class StateManager {
         //Reset the redo stack.
         //We can only redo things that were just undone.
         this.redoStack.length = 0;
-
     }
 
+    /**
+     * Restores the previous state
+     * 
+     * @returns the previous state or undefined if no state is stored 
+     */
     undo(): Shape[] | undefined {
-        if (this.stateStack.length <= 0) {
+        if (!this.canUndo()) {
             return;
         }
 
@@ -41,8 +53,21 @@ export class StateManager {
         return this.applyState(this.redoStack, newState);
     }
 
+    /**
+     * 
+     * @returns true if an action can be undone
+     */
+    canUndo(): boolean {
+        return this.stateStack.length > 0;
+    }
+
+    /**
+     * Reverses an undo action
+     * 
+     * @returns the new state or undefined if there is nothing to redo
+     */
     redo(): Shape[] | undefined {
-        if (this.redoStack.length <= 0) {
+        if (!this.canRedo()) {
             return;
         }
 
@@ -52,6 +77,14 @@ export class StateManager {
         }
 
         return this.applyState(this.stateStack, newState);
+    }
+
+    /**
+     * 
+     * @returns true if an action can be redone
+     */
+    canRedo(): boolean {
+        return this.redoStack.length > 0;
     }
 
     private applyState(stack: Shape[][], newState: Shape[]): Shape[] {
