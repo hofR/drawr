@@ -1,16 +1,15 @@
 import Konva from "konva";
 import { DrawingType } from '../drawing-type';
-import { DrawingMode } from '../drawing-mode';
 import { Drawer } from './drawer';
 import { ShapeConfig } from "../shape-config";
+import { ShapeType } from "../shapes/shape";
 
 
 export abstract class MoveDrawer<T extends Konva.Shape> extends Drawer<T> {
   drawingType = DrawingType.MOVE;
-  abstract drawingMode?: DrawingMode;
 
-  constructor(config: ShapeConfig) {
-    super(config);
+  constructor(config: ShapeConfig, shapeType: ShapeType) {
+    super(config, shapeType);
   }
 
   abstract override create(x: number, y: number): T;

@@ -11,11 +11,14 @@ import { PolygonDrawer } from './drawers/polygon-drawer';
 import { PolyLineDrawer } from './drawers/polyline-drawer';
 import { RectangleDrawer } from './drawers/rectangle-drawer';
 import { SelectionHandler } from "./selection-handler";
-import { ShapeConfig } from "./shape-config";
-import { Rectangle, fromShape, toKonvaRect } from "./shapes/rectangle";
 import { StateManager } from "./state-manager";
 import { Shape } from "./shapes/shape";
-
+import { RectangleFactory } from "./shapes/rectangle/rectangle-factory";
+import { ShapeFactory } from "./shapes/shape-factory";
+import { PolygonFactory } from "./shapes/polygon/polygon-factory";
+import { LineFactory } from "./shapes/line/line-factory";
+import { ShapeType } from "./shapes/shape";
+import { ShapeConfig } from "./shape-config";
 
 export class DrawingEditor {
     selectedIds: string[] = [];
@@ -35,11 +38,18 @@ export class DrawingEditor {
         fill: '#00D2FF',
         strokeWidth: 4,
     };
+    
     private readonly drawers = [
         new RectangleDrawer(this.shapeConfig),
         new PolygonDrawer(this.shapeConfig),
         new PolyLineDrawer(this.shapeConfig)
     ];
+
+    private readonly factoryMap: Record<ShapeType, ShapeFactory> = {
+        'RECTANGLE': new RectangleFactory(),
+        'LINE': new LineFactory(),
+        'POLYGON': new PolygonFactory(),
+    }
 
     constructor(
         selector: string,
@@ -131,14 +141,23 @@ export class DrawingEditor {
             .forEach((node) => node.destroy());
     }
 
-    public export(): Rectangle[] {
-        const rectangles = this.layer.find('Rect');
-        return rectangles.map((node: Konva.Node) => fromShape(node as Konva.Shape));
+    public export(): Shape[] {
+        const shapes = this.layer.find((node: Konva.Node) => node.id().startsWith('drawr'));        
+        return shapes.map((node: Konva.Node) => {
+            const shape = node as Konva.Shape;
+            let factory: ShapeFactory = this.factoryMap[shape.name() as ShapeType]
+            return factory?.fromKonva(shape);          
+        });
     }
 
     public import(shapes: Shape[]): void {
         this.layer.removeChildren();
-        const konvaShapes = shapes.map((shape: Shape) => toKonvaRect(shape as Rectangle));
+
+        const konvaShapes = shapes.map((shape: Shape) => {
+            let factory: ShapeFactory = this.factoryMap[shape.type]
+            return factory?.toKonva(shape);    
+        });
+
         konvaShapes.forEach((shape) => {
             this.layer.add(shape);
         });
