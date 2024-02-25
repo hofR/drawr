@@ -1,24 +1,25 @@
 import Konva from "konva";
 import { MoveDrawer } from './move-drawer';
-import { ShapeConfig } from "../shape-config";
+import { Rectangle, RectangleFactory, ShapeConfig } from "../shapes";
 
-export class RectangleDrawer extends MoveDrawer<Konva.Rect> {
+export class RectangleDrawer extends MoveDrawer<Konva.Rect, Rectangle> {
 
-  constructor(config: ShapeConfig) {
-    super(config, 'RECTANGLE');
+  constructor(factory: RectangleFactory) {
+    super(factory);
   }
 
   create(
     x: number,
     y: number,
+    config: ShapeConfig
   ): Konva.Rect {
-    return this.createShape(new Konva.Rect({
+    return this.factory.toKonva({
       x: x,
       y: y,
-      fill: this.config.fill,
-      stroke: this.config.stroke,
-      strokeWidth: this.config.strokeWidth,
-    }));
+      fill: config.fill,
+      stroke: config.stroke,
+      strokeWidth: config.strokeWidth,
+    });
   }
 
   resize(rect: Konva.Rect, x: number, y: number): void {

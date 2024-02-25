@@ -1,11 +1,14 @@
 import Konva from "konva";
 import { ShapeFactory } from "../shape-factory";
 import { Rectangle } from "./rectangle";
+import { ShapeType } from "../shape";
 
-export class RectangleFactory extends ShapeFactory {
+export class RectangleFactory extends ShapeFactory<Konva.Rect, Rectangle> {
+    override shapeType: ShapeType = 'RECTANGLE';
+
     override fromKonva(rect: Konva.Rect): Rectangle {
         return {
-            type: 'RECTANGLE',
+            type: this.shapeType,
             x: rect.x(),
             y: rect.y(),
             width: rect.width(),
@@ -16,8 +19,8 @@ export class RectangleFactory extends ShapeFactory {
         }
     }
 
-    override toKonva(rectangle: Rectangle): Konva.Rect {
-        return new Konva.Rect({
+    override toKonva(rectangle: Partial<Rectangle>): Konva.Rect {
+        return this.createKonvaShape(new Konva.Rect({
             x: rectangle.x,
             y: rectangle.y,
             width: rectangle.width,
@@ -25,6 +28,6 @@ export class RectangleFactory extends ShapeFactory {
             fill: rectangle.fill,
             stroke: rectangle.stroke,
             strokeWidth: rectangle.strokeWidth,
-        });
+        }));
     }
 }

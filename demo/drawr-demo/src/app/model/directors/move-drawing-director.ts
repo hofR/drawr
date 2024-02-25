@@ -1,18 +1,20 @@
 import Konva from "konva";
 import { KonvaEventObject } from 'konva/lib/Node';
-import { Shape } from 'konva/lib/Shape';
-import { MoveDrawer } from '../drawers/move-drawer';
 import { DrawingDirector } from './drawing-director';
+import { ShapeConfig, Shape } from "../shapes";
+import { MoveDrawer } from "../drawers/move-drawer";
 
 
-export class MoveDrawingDirector<DrawerType extends MoveDrawer<Shape>> extends DrawingDirector<DrawerType> {
+export class MoveDrawingDirector<KonvaShape extends Konva.Shape, S extends Shape> 
+extends DrawingDirector<KonvaShape, S, MoveDrawer<KonvaShape, S>> {
 
   constructor(
     stage: Konva.Stage,
     layer: Konva.Layer,
-    drawer: DrawerType
+    drawer: MoveDrawer<KonvaShape, S>,
+    shapeConfig: ShapeConfig
   ) {
-    super(stage, layer, drawer);
+    super(stage, layer, drawer, shapeConfig);
   }
 
   handleMouseUp(mouseEvent: KonvaEventObject<MouseEvent>) {

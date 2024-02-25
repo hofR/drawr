@@ -15,10 +15,7 @@ import { StateManager } from "./state-manager";
 import { Shape } from "./shapes/shape";
 import { RectangleFactory } from "./shapes/rectangle/rectangle-factory";
 import { ShapeFactory } from "./shapes/shape-factory";
-import { PolygonFactory } from "./shapes/polygon/polygon-factory";
-import { LineFactory } from "./shapes/line/line-factory";
-import { ShapeType } from "./shapes/shape";
-import { ShapeConfig } from "./shape-config";
+import { ShapeConfig, ShapeType, LineFactory, PolygonFactory} from "./shapes";
 
 export class DrawingEditor {
     selectedIds: string[] = [];
@@ -28,7 +25,7 @@ export class DrawingEditor {
     private readonly selectionHandler?: SelectionHandler;
     private readonly stateManager: StateManager;
 
-    private director: DrawingDirector<Drawer<Konva.Shape>>;
+    private director: DrawingDirector;
 
     private isSelectActive = false;
     private isDragActive = false;
@@ -38,17 +35,23 @@ export class DrawingEditor {
         fill: '#00D2FF',
         strokeWidth: 4,
     };
-    
+
     private readonly drawers = [
-        new RectangleDrawer(this.shapeConfig),
-        new PolygonDrawer(this.shapeConfig),
-        new PolyLineDrawer(this.shapeConfig)
+        new RectangleDrawer(new RectangleFactory()),
+        new PolygonDrawer(new PolygonFactory()),
+        new PolyLineDrawer(new LineFactory())
     ];
 
     private readonly factoryMap: Record<ShapeType, ShapeFactory> = {
         'RECTANGLE': new RectangleFactory(),
         'LINE': new LineFactory(),
         'POLYGON': new PolygonFactory(),
+    }
+
+    private readonly drawerMap: Record<ShapeType, Drawer> = {
+        'RECTANGLE': new RectangleDrawer(new RectangleFactory()),
+        'LINE': new PolyLineDrawer(new LineFactory()),
+        'POLYGON': new PolygonDrawer(new PolygonFactory()),
     }
 
     constructor(
@@ -74,7 +77,8 @@ export class DrawingEditor {
         this.director = new MoveDrawingDirector(
             this.stage,
             this.layer,
-            new RectangleDrawer(this.shapeConfig)
+            new RectangleDrawer(new RectangleFactory()),
+            this.shapeConfig,
         );
 
         this.stateManager = new StateManager();
@@ -125,14 +129,11 @@ export class DrawingEditor {
     }
 
     public deleteSelected() {
+        console.log(this.selectedIds)
         this.findById(this.selectedIds)
             .forEach((node) => node.destroy());
 
         this.selectedIds = this.selectionHandler?.updateSelection([]) ?? []
-    }
-
-    private findById(ids: string[]): Konva.Shape[] {
-        return this.layer.find((node: Konva.Node) => ids.includes(node.id()));
     }
 
     public removeByNames(names: string[]): void {
@@ -141,28 +142,61 @@ export class DrawingEditor {
             .forEach((node) => node.destroy());
     }
 
+    /**
+     * Exports all rendered shapes
+     * 
+     * @returns Array of Shapes
+     */
     public export(): Shape[] {
-        const shapes = this.layer.find((node: Konva.Node) => node.id().startsWith('drawr'));        
+        const shapes = this.findAll();
         return shapes.map((node: Konva.Node) => {
             const shape = node as Konva.Shape;
-            let factory: ShapeFactory = this.factoryMap[shape.name() as ShapeType]
-            return factory?.fromKonva(shape);          
+            let factory = this.factoryMap[shape.name() as ShapeType]
+            return factory?.fromKonva(shape);
         });
     }
 
-    public import(shapes: Shape[]): void {
-        this.layer.removeChildren();
+    /**
+     * Clears all shapes
+     */
+    public clear(): void {
+        this.findAll().forEach((shape: Konva.Shape) => shape.destroy());
+        this.selectionHandler?.updateSelection([]);
+    }
 
+    /**
+     * Imports an array of shapes and displays them
+     * 
+     * @param shapes 
+     */
+    public import(shapes: Shape[]): void {
+        this.addShapes(shapes);
+    }
+
+    /**
+     * Clears all shapes and imports an array of shapes
+     * 
+     * @param shapes 
+     */
+    public clearAndImport(shapes: Shape[]): void {
+        this.clear();
+        this.addShapes(shapes);
+    }
+
+    private addShapes(shapes: Shape[]): void {
         const konvaShapes = shapes.map((shape: Shape) => {
-            let factory: ShapeFactory = this.factoryMap[shape.type]
-            return factory?.toKonva(shape);    
+            let factory = this.factoryMap[shape.type];
+            return factory?.toKonva(shape);
         });
 
         konvaShapes.forEach((shape) => {
             this.layer.add(shape);
-        });
+        });        
     }
 
+    /**
+     * Undo the last action
+     */
     public undo(): void {
         const newState = this.stateManager?.undo();
         if (newState) {
@@ -170,6 +204,9 @@ export class DrawingEditor {
         }
     }
 
+    /**
+     * Redo the last undone action
+     */
     public redo(): void {
         const newState = this.stateManager?.redo();
         if (newState) {
@@ -177,20 +214,30 @@ export class DrawingEditor {
         }
     }
 
-    private createDirector(drawer: Drawer<Konva.Shape>): DrawingDirector<Drawer<Konva.Shape>> {
+    private findAll(): Konva.Shape[] {
+        return this.layer.find((node: Konva.Node) => node.id().startsWith('drawr'));
+    }
+
+    private findById(ids: string[]): Konva.Shape[] {
+        return this.layer.find((node: Konva.Node) => ids.includes(node.id()));
+    }
+
+    private createDirector(drawer: Drawer): DrawingDirector {
         let director = undefined;
 
         if (DrawingType.CLICK === drawer.drawingType) {
             director = new ClickDrawingDirector(
                 this.stage,
                 this.layer,
-                drawer as ClickDrawer<Konva.Shape>
+                drawer as ClickDrawer<Konva.Shape, Shape>,
+                this.shapeConfig
             );
         } else if (DrawingType.MOVE === drawer.drawingType) {
             director = new MoveDrawingDirector(
                 this.stage,
                 this.layer,
-                drawer
+                drawer,
+                this.shapeConfig
             );
         } else {
             throw new Error(`${drawer.drawingType} is unkown!`);

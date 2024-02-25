@@ -4,7 +4,7 @@ import Konva from 'konva';
  * Stolen from https://konvajs.org/docs/select_and_transform/Basic_demo.html
  */
 export class SelectionHandler {
-    onSelect?: (ids: string[]) => void; 
+    onSelect?: (ids: string[]) => void;
 
     private selecting = false;
     private readonly selectionRectangle = new Konva.Rect({
@@ -27,13 +27,13 @@ export class SelectionHandler {
     }
 
     public dispose(): void {
-        this.selecting = false;
-        this.transformer.nodes([]);
+        this.updateSelection([]);
+
         this.layer
-            .findOne((node: Konva.Node) => node.hasName(this.selectionRectangle.name))
+            .findOne((node: Konva.Node) => node.hasName(this.selectionRectangle.name()))
             ?.remove();
         this.layer
-            .findOne((node: Konva.Node) => node.hasName(this.transformer.name))
+            .findOne((node: Konva.Node) => node.hasName(this.transformer.name()))
             ?.remove;
 
         this.stage.removeEventListener('mousedown touchstart');
@@ -54,7 +54,10 @@ export class SelectionHandler {
 
     public updateSelection(nodes: Konva.Node[]): string[] {
         this.transformer.nodes(nodes);
-        return this.getSelectedIds();
+        const selectedIds = this.getSelectedIds();
+        this.fireOnSelect();
+
+        return selectedIds;
     }
 
     public getSelectedIds(): string[] {
@@ -146,7 +149,11 @@ export class SelectionHandler {
             this.transformer.nodes(nodes);
         }
 
-        if(this.onSelect) {
+        this.fireOnSelect();
+    }
+
+    private fireOnSelect(): void {
+        if (this.onSelect) {
             this.onSelect(this.getSelectedIds());
         }
     }

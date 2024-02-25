@@ -1,24 +1,27 @@
 import Konva from "konva";
 import { ClickDrawer } from './click-drawer';
-import { ShapeConfig } from "../shape-config";
+import { ShapeConfig } from "../shapes/shape";
+import { Polygon, PolygonFactory } from "../shapes";
 
 
-export class PolygonDrawer extends ClickDrawer<Konva.Line> {
+export class PolygonDrawer extends ClickDrawer<Konva.Line, Polygon> {
 
-  constructor(config: ShapeConfig) {
-    super(config, 'POLYGON');
+  constructor(factory: PolygonFactory) {
+    super(factory);
   }
 
   create(
     x: number,
     y: number,
-  ): Konva.Line {
-    return this.createShape<Konva.Line>(new Konva.Line({
+    config: ShapeConfig,
+  ): Konva.Line 
+  {
+    return this.factory.toKonva({
       points: [x, y],
-      fill: this.config.fill,
-      stroke: this.config.stroke,
-      strokeWidth: this.config.strokeWidth,
-    }));
+      fill: config.fill,
+      stroke: config.stroke,
+      strokeWidth: config.strokeWidth,
+    });
   }
 
   resize(rect: Konva.Line, x: number, y: number): void {
