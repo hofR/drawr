@@ -18,6 +18,7 @@ export class AppComponent implements OnInit {
   editor?: DrawingEditor;
   DrawerType = DrawingMode;
   shapes?: Shape[];
+  selected: string[] = [];
 
   ngOnInit(): void {
     this.initKonva()
@@ -25,6 +26,7 @@ export class AppComponent implements OnInit {
 
   initKonva() {
     this.editor = new DrawingEditor('container', window.innerWidth, window.innerHeight);
+    this.editor.onSelect = (ids) => {this.selected = ids}
   }
 
   changeTool(type: DrawingMode) {
@@ -55,6 +57,10 @@ export class AppComponent implements OnInit {
   onColorChanged(event: Event) {
     const color = (event.target as HTMLInputElement).value;
     this.editor?.changeFill(color);
+
+    if(this.selected.length > 0) {
+      this.editor?.updateShapeConfig({fill: color}, ...this.selected)
+    }
   }
 
   onDelete() {

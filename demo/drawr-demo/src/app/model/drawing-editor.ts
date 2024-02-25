@@ -15,6 +15,8 @@ import { StateManager } from "./state-manager";
 import { Shape, RectangleFactory, ShapeConfig, ShapeType, LineFactory, PolygonFactory, ShapeFactory } from "./shapes";
 
 export class DrawingEditor {
+    onSelect?: (ids: string[]) => void;
+
     selectedIds: string[] = [];
 
     private readonly stage: Konva.Stage;
@@ -77,6 +79,9 @@ export class DrawingEditor {
         this.selectionHandler = new SelectionHandler(this.stage, this.layer);
         this.selectionHandler.onSelect = (selected) => {
             this.selectedIds = selected;
+            if(this.onSelect) {
+                this.onSelect(selected);
+            }
         }
 
         this.director = new MoveDrawingDirector(
@@ -88,6 +93,7 @@ export class DrawingEditor {
 
         this.stateManager = new StateManager();
     }
+
 
     public changeTool(type: DrawingMode): void {
         const drawer = this.drawers[type];
@@ -188,17 +194,6 @@ export class DrawingEditor {
         this.addShapes(shapes);
     }
 
-    private addShapes(shapes: Shape[]): void {
-        const konvaShapes = shapes.map((shape: Shape) => {
-            let factory = this.factoryMap[shape.type];
-            return factory?.toKonva(shape);
-        });
-
-        konvaShapes.forEach((shape) => {
-            this.layer.add(shape);
-        });
-    }
-
     /**
      * Undo the last action
      */
@@ -233,6 +228,27 @@ export class DrawingEditor {
      */
     public canRedo(): boolean {
         return this.stateManager?.canRedo();
+    }
+
+    /**
+     * Updates the ShapeConfig of the shapes with the ids passed to the method.
+     * Only properties with a value are updated
+     * 
+     * @param config which should be applied
+     * @param ids of the shapes that should be updated
+     */
+    public updateShapeConfig(config: ShapeConfig, ...ids: string[]): void {
+        const nodes = this.findById(ids);
+        if(!nodes) {
+            return;
+        }
+
+        nodes.forEach((node: Konva.Node) => {
+            const shape = node as Konva.Shape;
+            shape.fill(config.fill ?? shape.fill());
+            shape.strokeWidth(config.strokeWidth ?? shape.strokeWidth());
+            shape.stroke(config.stroke ?? shape.stroke());
+        });
     }
 
     private findAll(): Konva.Shape[] {
@@ -270,5 +286,16 @@ export class DrawingEditor {
 
     private onShapeCreated(shape: Konva.Shape) {
         this.stateManager?.save(this.export());
+    }
+
+    private addShapes(shapes: Shape[]): void {
+        const konvaShapes = shapes.map((shape: Shape) => {
+            let factory = this.factoryMap[shape.type];
+            return factory?.toKonva(shape);
+        });
+
+        konvaShapes.forEach((shape) => {
+            this.layer.add(shape);
+        });
     }
 }
