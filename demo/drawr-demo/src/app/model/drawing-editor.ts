@@ -51,6 +51,14 @@ export class DrawingEditor {
         'POLYGON': new PolygonDrawer(new PolygonFactory()),
     }
 
+    get isDragEnabled(): boolean {
+        return this.isDragActive;
+    }
+
+    get isSelectionEnabled(): boolean {
+        return this.isSelectActive;
+    }
+
     constructor(
         selector: string,
         width: number,
