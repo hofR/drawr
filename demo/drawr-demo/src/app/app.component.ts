@@ -72,6 +72,7 @@ export class AppComponent implements OnInit {
  }
 
   import() {
+    console.log(this.shapes)
     this.editor?.import(this.shapes ?? []);
   }
 

@@ -12,8 +12,9 @@ import { PolyLineDrawer } from './shapes/line/polyline-drawer';
 import { RectangleDrawer } from './shapes/rectangle/rectangle-drawer';
 import { SelectionHandler } from "./selection-handler";
 import { StateManager } from "./state-manager";
-import { ShapeData, RectangleFactory, ShapeConfig, ShapeType, LineFactory, PolygonFactory, ShapeFactory, Shape } from "./shapes";
+import { ShapeData, ShapeConfig, ShapeType, Shape } from "./shapes";
 import { QueryHelper } from "./query-helper";
+import { KonvaShapeMapper } from "./shapes/mapper";
 
 export class DrawingEditor {
     onSelect?: (ids: string[]) => void;
@@ -38,21 +39,15 @@ export class DrawingEditor {
     };
 
     private readonly drawers = [
-        new RectangleDrawer(new RectangleFactory()),
-        new PolygonDrawer(new PolygonFactory()),
-        new PolyLineDrawer(new LineFactory())
+        new RectangleDrawer(),
+        new PolygonDrawer(),
+        new PolyLineDrawer()
     ];
 
-    private readonly factoryMap: Record<ShapeType, ShapeFactory> = {
-        'RECTANGLE': new RectangleFactory(),
-        'LINE': new LineFactory(),
-        'POLYGON': new PolygonFactory(),
-    }
-
     private readonly drawerMap: Record<ShapeType, Drawer> = {
-        'RECTANGLE': new RectangleDrawer(new RectangleFactory()),
-        'LINE': new PolyLineDrawer(new LineFactory()),
-        'POLYGON': new PolygonDrawer(new PolygonFactory()),
+        'RECTANGLE': new RectangleDrawer(),
+        'LINE': new PolyLineDrawer(),
+        'POLYGON': new PolygonDrawer(),
     }
 
     get isDragEnabled(): boolean {
@@ -89,7 +84,7 @@ export class DrawingEditor {
         this.director = new MoveDrawingDirector(
             this.stage,
             this.layer,
-            new RectangleDrawer(new RectangleFactory()),
+            new RectangleDrawer(),
             this.shapeConfig,
         );
 
@@ -255,7 +250,7 @@ export class DrawingEditor {
             director = new ClickDrawingDirector(
                 this.stage,
                 this.layer,
-                drawer as ClickDrawer<Konva.Shape, ShapeData>,
+                drawer as ClickDrawer<Konva.Shape>,
                 this.shapeConfig
             );
         } else if (DrawingType.MOVE === drawer.drawingType) {
@@ -279,8 +274,14 @@ export class DrawingEditor {
 
     private addShapes(shapes: ShapeData[]): void {
         const konvaShapes = shapes.map((shape: ShapeData) => {
-            let factory = this.factoryMap[shape.type];
-            return factory?.toKonva(shape);
+            //let factory = this.factoryMap[shape.type];
+            const dict: Record<ShapeType, typeof Konva.Shape> = {
+                "LINE": Konva.Line,
+                "RECTANGLE": Konva.Rect,
+                "POLYGON": Konva.Line
+            };
+
+            return KonvaShapeMapper.map<ShapeData, Konva.Shape>(shape, dict[shape.type], shape.type)
         });
 
         konvaShapes.forEach((shape) => {

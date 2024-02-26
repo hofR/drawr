@@ -1,20 +1,16 @@
 import Konva from "konva";
 import { MoveDrawer } from '../../drawers/move-drawer';
-import { ShapeConfig } from "../shape";
-import { LineData, LineFactory } from "..";
+import { ShapeConfig, ShapeType } from "../shape";
 
-export class PolyLineDrawer extends MoveDrawer<Konva.Line, LineData> {
-
-  constructor(factory: LineFactory) {
-    super(factory);
-  }
+export class PolyLineDrawer extends MoveDrawer<Konva.Line> {
+  override shapeType: ShapeType = 'LINE';
 
   create(
     x: number,
     y: number,
     config: ShapeConfig
   ): Konva.Line {
-    return this.factory.toKonva({
+    return new Konva.Line({
       points: [x, y],
       fill: config.fill,
       stroke: config.stroke,

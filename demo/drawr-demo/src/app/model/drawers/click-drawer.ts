@@ -1,16 +1,10 @@
 import Konva from "konva";
 import { DrawingType } from '../drawing-type';
 import { Drawer } from './drawer';
-import { ShapeData, ShapeConfig, ShapeFactory } from "../shapes";
+import { ShapeConfig } from "../shapes";
 
-
-export abstract class ClickDrawer<KonvaShape extends Konva.Shape, S extends ShapeData>
- extends Drawer<KonvaShape, S> {
+export abstract class ClickDrawer<KonvaShape extends Konva.Shape> extends Drawer<KonvaShape> {
   drawingType = DrawingType.CLICK;
-
-  constructor(factory: ShapeFactory<KonvaShape, S>) {
-    super(factory);
-  }
 
   abstract override create(x: number, y: number, config: ShapeConfig): KonvaShape;
   abstract override resize(object: KonvaShape, x: number, y: number): void;

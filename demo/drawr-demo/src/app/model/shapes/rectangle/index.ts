@@ -1,3 +1,3 @@
 export * from './rectangle';
-export * from './rectangle-factory';
 export * from './rectangle-drawer';
+export * from './rectangle.data';

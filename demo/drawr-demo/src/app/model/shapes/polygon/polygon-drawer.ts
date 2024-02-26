@@ -1,14 +1,9 @@
 import Konva from "konva";
 import { ClickDrawer } from '../../drawers/click-drawer';
-import { ShapeConfig } from "../shape";
-import { PolygonData, PolygonFactory } from "..";
+import { ShapeConfig, ShapeType } from "../shape";
 
-
-export class PolygonDrawer extends ClickDrawer<Konva.Line, PolygonData> {
-
-  constructor(factory: PolygonFactory) {
-    super(factory);
-  }
+export class PolygonDrawer extends ClickDrawer<Konva.Line> {
+  override shapeType: ShapeType = 'POLYGON'
 
   create(
     x: number,
@@ -16,7 +11,9 @@ export class PolygonDrawer extends ClickDrawer<Konva.Line, PolygonData> {
     config: ShapeConfig,
   ): Konva.Line 
   {
-    return this.factory.toKonva({
+    return new Konva.Line({
+      id: this.getId(),
+      name: this.shapeType,
       points: [x, y],
       fill: config.fill,
       stroke: config.stroke,

@@ -2,18 +2,18 @@ import Konva from "konva";
 import { KonvaEventObject } from 'konva/lib/Node';
 import { ClickDrawer } from '../drawers/click-drawer';
 import { DrawingDirector } from './drawing-director';
-import { ShapeData, ShapeConfig } from "../shapes";
+import { ShapeConfig } from "../shapes";
 
 
-export class ClickDrawingDirector<KonvaShape extends Konva.Shape, S extends ShapeData>
-  extends DrawingDirector<KonvaShape, S, ClickDrawer<KonvaShape, S>> {
+export class ClickDrawingDirector<KonvaShape extends Konva.Shape>
+  extends DrawingDirector<KonvaShape, ClickDrawer<KonvaShape>> {
 
   private initalMouseDownHandled = false;
 
   constructor(
     stage: Konva.Stage,
     layer: Konva.Layer,
-    drawer: ClickDrawer<KonvaShape, S>,
+    drawer: ClickDrawer<KonvaShape>,
     shapeConfig: ShapeConfig
   ) {
     super(stage, layer, drawer, shapeConfig);

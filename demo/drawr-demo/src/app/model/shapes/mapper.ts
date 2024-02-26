@@ -1,10 +1,23 @@
+import Konva from "konva";
 import { Line, LineData } from "./line";
 import { Polygon, PolygonData } from "./polygon";
-import { Rectangle, RectangleData } from "./rectangle";
-import { Shape, ShapeData } from "./shape";
+import { Shape, ShapeData, ShapeType} from "./shape";
+import { IdHelper } from "../id-helper";
 
 export interface Mapper<Source, Destination> {
     map(source: Source): Destination
+}
+
+export interface KonvaMapper<Source extends ShapeData = ShapeData, Destination extends Konva.Shape = Konva.Shape> extends Mapper<Source, Destination> { }
+
+export class KonvaShapeMapper<Source extends ShapeData, Destination extends Konva.Shape> {
+   static map<Source, Destination>(source: Source, destination: { new(config: Konva.ShapeConfig): Destination}, type: ShapeType): Destination {
+        return new destination({
+            id: IdHelper.getId(),
+            name: type,
+            ...source
+        })
+    }
 }
 
 export class ShapeDataMapper implements Mapper<Shape, ShapeData> {
@@ -15,19 +28,6 @@ export class ShapeDataMapper implements Mapper<Shape, ShapeData> {
             stroke: source.stroke,
             strokeWidth: source.strokeWidth
         }
-    }
-}
-
-export class RectangleDataMapper implements Mapper<Rectangle, RectangleData> {
-    map(source: Rectangle): RectangleData {
-        const shapeData = new ShapeDataMapper().map(source);
-        return {
-            x: source.x,
-            y: source.y,
-            width: source.width,
-            height: source.height,
-            ...shapeData
-        };
     }
 }
 

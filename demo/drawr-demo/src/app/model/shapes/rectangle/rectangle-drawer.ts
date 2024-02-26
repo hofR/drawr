@@ -1,19 +1,18 @@
 import Konva from "konva";
 import { MoveDrawer } from '../../drawers/move-drawer';
-import { RectangleData, RectangleFactory, ShapeConfig } from "..";
+import { ShapeConfig, ShapeType } from "..";
 
-export class RectangleDrawer extends MoveDrawer<Konva.Rect, RectangleData> {
-
-  constructor(factory: RectangleFactory) {
-    super(factory);
-  }
+export class RectangleDrawer extends MoveDrawer<Konva.Rect> {
+  override shapeType: ShapeType = 'RECTANGLE'
 
   create(
     x: number,
     y: number,
     config: ShapeConfig
   ): Konva.Rect {
-    return this.factory.toKonva({
+    return new Konva.Rect({
+      id: this.getId(),
+      name: this.shapeType,
       x: x,
       y: y,
       fill: config.fill,

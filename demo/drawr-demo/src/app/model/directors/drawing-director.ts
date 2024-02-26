@@ -5,8 +5,7 @@ import { ShapeConfig, ShapeData } from "../shapes/shape";
 
 export abstract class DrawingDirector<
   KonvaShape extends Konva.Shape = Konva.Shape,
-  S extends ShapeData = ShapeData,
-  DrawerType extends Drawer<KonvaShape, S> = Drawer<KonvaShape, S>
+  DrawerType extends Drawer<KonvaShape> = Drawer<KonvaShape>
 > {
   protected isDraw = false;
   protected newAnnotation?: KonvaShape;
