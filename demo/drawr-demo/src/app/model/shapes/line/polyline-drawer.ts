@@ -1,9 +1,9 @@
 import Konva from "konva";
 import { MoveDrawer } from '../../drawers/move-drawer';
 import { ShapeConfig } from "../shape";
-import { Line, LineFactory } from "..";
+import { LineData, LineFactory } from "..";
 
-export class PolyLineDrawer extends MoveDrawer<Konva.Line, Line> {
+export class PolyLineDrawer extends MoveDrawer<Konva.Line, LineData> {
 
   constructor(factory: LineFactory) {
     super(factory);

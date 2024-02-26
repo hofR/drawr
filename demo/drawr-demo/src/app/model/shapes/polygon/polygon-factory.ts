@@ -1,13 +1,13 @@
 import Konva from "konva";
 import { ShapeFactory } from "../shape-factory";
-import { Polygon } from "./polygon";
+import { PolygonData } from "./polygon";
 import { ShapeType } from "../shape";
 
-export class PolygonFactory extends ShapeFactory<Konva.Line, Polygon> {
+export class PolygonFactory extends ShapeFactory<Konva.Line, PolygonData> {
 
     override shapeType: ShapeType = 'POLYGON'
 
-    override fromKonva(line: Konva.Line): Polygon {
+    override fromKonva(line: Konva.Line): PolygonData {
         return {
             type: this.shapeType,
             points: line.points(),
@@ -18,7 +18,7 @@ export class PolygonFactory extends ShapeFactory<Konva.Line, Polygon> {
         }
     }
 
-    override toKonva(polygon: Partial<Polygon>): Konva.Line {
+    override toKonva(polygon: Partial<PolygonData>): Konva.Line {
         return this.createKonvaShape(new Konva.Line({
             points: polygon.points,
             fill: polygon.fill,

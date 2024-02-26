@@ -1,11 +1,11 @@
 import Konva from "konva";
 import { KonvaEventObject } from 'konva/lib/Node';
 import { DrawingDirector } from './drawing-director';
-import { ShapeConfig, Shape } from "../shapes";
+import { ShapeConfig, ShapeData } from "../shapes";
 import { MoveDrawer } from "../drawers/move-drawer";
 
 
-export class MoveDrawingDirector<KonvaShape extends Konva.Shape, S extends Shape> 
+export class MoveDrawingDirector<KonvaShape extends Konva.Shape, S extends ShapeData> 
 extends DrawingDirector<KonvaShape, S, MoveDrawer<KonvaShape, S>> {
 
   constructor(

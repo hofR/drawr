@@ -1,8 +1,8 @@
 import Konva from 'konva';
 import { DrawingType } from '../drawing-type';
-import { ShapeConfig, ShapeFactory, Shape } from '../shapes';
+import { ShapeConfig, ShapeFactory, ShapeData } from '../shapes';
 
-export abstract class Drawer<KonvaShape extends Konva.Shape = Konva.Shape, S extends Shape = Shape> {
+export abstract class Drawer<KonvaShape extends Konva.Shape = Konva.Shape, S extends ShapeData = ShapeData> {
   abstract drawingType: DrawingType;
 
   constructor(

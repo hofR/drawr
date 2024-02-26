@@ -1,7 +1,7 @@
 import Konva from "konva";
-import { Shape, ShapeType } from "./shape";
+import { ShapeData, ShapeType } from "./shape";
 
-export abstract class ShapeFactory<KonvaShape extends Konva.Shape = Konva.Shape, S extends Shape = Shape> {
+export abstract class ShapeFactory<KonvaShape extends Konva.Shape = Konva.Shape, S extends ShapeData = ShapeData> {
     private static id: number = 0;
 
     abstract shapeType: ShapeType;

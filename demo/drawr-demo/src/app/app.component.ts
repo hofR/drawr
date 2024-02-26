@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { DrawingEditor } from './model/drawing-editor';
 import { DrawingMode } from './model/drawing-mode';
-import { Shape } from './model/shapes/shape';
+import { ShapeData } from './model/shapes/shape';
 
 @Component({
   selector: 'app-root',
@@ -17,7 +17,7 @@ export class AppComponent implements OnInit {
   title = 'drawr-demo';
   editor?: DrawingEditor;
   DrawerType = DrawingMode;
-  shapes?: Shape[];
+  shapes?: ShapeData[];
   selected: string[] = [];
 
   ngOnInit(): void {

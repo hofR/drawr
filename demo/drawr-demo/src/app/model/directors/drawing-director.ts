@@ -1,11 +1,11 @@
 import Konva from "konva";
 import { KonvaEventObject } from 'konva/lib/Node';
 import { Drawer } from '../drawers/drawer';
-import { ShapeConfig, Shape } from "../shapes/shape";
+import { ShapeConfig, ShapeData } from "../shapes/shape";
 
 export abstract class DrawingDirector<
   KonvaShape extends Konva.Shape = Konva.Shape,
-  S extends Shape = Shape,
+  S extends ShapeData = ShapeData,
   DrawerType extends Drawer<KonvaShape, S> = Drawer<KonvaShape, S>
 > {
   protected isDraw = false;
@@ -29,9 +29,9 @@ export abstract class DrawingDirector<
     const x = mouseEvent.evt.clientX;
     const y = mouseEvent.evt.clientY;
 
-    const rect = this.drawer.create(x, y, this.shapeConfig);
-    this.newAnnotation = rect;
-    this.layer?.add(rect);
+    const shape = this.drawer.create(x, y, this.shapeConfig);
+    this.newAnnotation = shape;
+    this.layer?.add(shape);
   }
 
   protected addEventListeners() {

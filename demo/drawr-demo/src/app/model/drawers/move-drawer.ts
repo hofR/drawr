@@ -1,10 +1,10 @@
 import Konva from "konva";
 import { DrawingType } from '../drawing-type';
 import { Drawer } from './drawer';
-import { ShapeConfig, ShapeFactory, Shape } from "../shapes";
+import { ShapeConfig, ShapeFactory, ShapeData } from "../shapes";
 
 
-export abstract class MoveDrawer<KonvaShape extends Konva.Shape, S extends Shape>
+export abstract class MoveDrawer<KonvaShape extends Konva.Shape, S extends ShapeData>
   extends Drawer<KonvaShape, S> {
 
   drawingType = DrawingType.MOVE;

@@ -12,7 +12,8 @@ import { PolyLineDrawer } from './shapes/line/polyline-drawer';
 import { RectangleDrawer } from './shapes/rectangle/rectangle-drawer';
 import { SelectionHandler } from "./selection-handler";
 import { StateManager } from "./state-manager";
-import { Shape, RectangleFactory, ShapeConfig, ShapeType, LineFactory, PolygonFactory, ShapeFactory } from "./shapes";
+import { ShapeData, RectangleFactory, ShapeConfig, ShapeType, LineFactory, PolygonFactory, ShapeFactory, Shape } from "./shapes";
+import { QueryHelper } from "./query-helper";
 
 export class DrawingEditor {
     onSelect?: (ids: string[]) => void;
@@ -23,6 +24,7 @@ export class DrawingEditor {
     private readonly layer: Konva.Layer;
     private readonly selectionHandler?: SelectionHandler;
     private readonly stateManager: StateManager;
+    private readonly queryHelper: QueryHelper;
 
     private director: DrawingDirector;
 
@@ -79,7 +81,7 @@ export class DrawingEditor {
         this.selectionHandler = new SelectionHandler(this.stage, this.layer);
         this.selectionHandler.onSelect = (selected) => {
             this.selectedIds = selected;
-            if(this.onSelect) {
+            if (this.onSelect) {
                 this.onSelect(selected);
             }
         }
@@ -92,6 +94,7 @@ export class DrawingEditor {
         );
 
         this.stateManager = new StateManager();
+        this.queryHelper = new QueryHelper(this.layer);
     }
 
 
@@ -140,9 +143,9 @@ export class DrawingEditor {
     }
 
     public deleteSelected() {
-        console.log(this.selectedIds)
-        this.findById(this.selectedIds)
-            .forEach((node) => node.destroy());
+        this.queryHelper
+            .findById(this.selectedIds)
+            .forEach((shape) => shape.delete());
 
         this.selectedIds = this.selectionHandler?.updateSelection([]) ?? []
     }
@@ -158,12 +161,10 @@ export class DrawingEditor {
      * 
      * @returns Array of Shapes
      */
-    public export(): Shape[] {
-        const shapes = this.findAll();
-        return shapes.map((node: Konva.Node) => {
-            const shape = node as Konva.Shape;
-            let factory = this.factoryMap[shape.name() as ShapeType]
-            return factory?.fromKonva(shape);
+    public export(): ShapeData[] {
+        const shapes = this.queryHelper.findAll();
+        return shapes.map((shape) => {
+            return shape.toData();
         });
     }
 
@@ -171,7 +172,7 @@ export class DrawingEditor {
      * Clears all shapes
      */
     public clear(): void {
-        this.findAll().forEach((shape: Konva.Shape) => shape.destroy());
+        this.queryHelper.findAll().forEach((shape) => shape.delete())
         this.selectionHandler?.updateSelection([]);
     }
 
@@ -180,7 +181,7 @@ export class DrawingEditor {
      * 
      * @param shapes 
      */
-    public import(shapes: Shape[]): void {
+    public import(shapes: ShapeData[]): void {
         this.addShapes(shapes);
     }
 
@@ -189,7 +190,7 @@ export class DrawingEditor {
      * 
      * @param shapes 
      */
-    public clearAndImport(shapes: Shape[]): void {
+    public clearAndImport(shapes: ShapeData[]): void {
         this.clear();
         this.addShapes(shapes);
     }
@@ -238,26 +239,14 @@ export class DrawingEditor {
      * @param ids of the shapes that should be updated
      */
     public updateShapeConfig(config: ShapeConfig, ...ids: string[]): void {
-        const nodes = this.findById(ids);
-        if(!nodes) {
+        const shapes = this.queryHelper.findById(ids);
+        if (!shapes) {
             return;
         }
 
-        nodes.forEach((node: Konva.Node) => {
-            const shape = node as Konva.Shape;
-            shape.fill(config.fill ?? shape.fill());
-            shape.strokeWidth(config.strokeWidth ?? shape.strokeWidth());
-            shape.stroke(config.stroke ?? shape.stroke());
-        });
+        shapes.forEach((shape: Shape) => shape.updateConfig(config));
     }
 
-    private findAll(): Konva.Shape[] {
-        return this.layer.find((node: Konva.Node) => node.id().startsWith('drawr'));
-    }
-
-    private findById(ids: string[]): Konva.Shape[] {
-        return this.layer.find((node: Konva.Node) => ids.includes(node.id()));
-    }
 
     private createDirector(drawer: Drawer): DrawingDirector {
         let director = undefined;
@@ -266,7 +255,7 @@ export class DrawingEditor {
             director = new ClickDrawingDirector(
                 this.stage,
                 this.layer,
-                drawer as ClickDrawer<Konva.Shape, Shape>,
+                drawer as ClickDrawer<Konva.Shape, ShapeData>,
                 this.shapeConfig
             );
         } else if (DrawingType.MOVE === drawer.drawingType) {
@@ -288,8 +277,8 @@ export class DrawingEditor {
         this.stateManager?.save(this.export());
     }
 
-    private addShapes(shapes: Shape[]): void {
-        const konvaShapes = shapes.map((shape: Shape) => {
+    private addShapes(shapes: ShapeData[]): void {
+        const konvaShapes = shapes.map((shape: ShapeData) => {
             let factory = this.factoryMap[shape.type];
             return factory?.toKonva(shape);
         });

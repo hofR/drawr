@@ -1,12 +1,12 @@
 import Konva from "konva";
 import { ShapeFactory } from "../shape-factory";
 import { ShapeType } from "../shape";
-import { Line } from "./line";
+import { LineData } from "./line";
 
-export class LineFactory extends ShapeFactory<Konva.Line, Line> {
+export class LineFactory extends ShapeFactory<Konva.Line, LineData> {
     override shapeType: ShapeType = 'LINE';
 
-    override fromKonva(line: Konva.Line): Line {
+    override fromKonva(line: Konva.Line): LineData {
         return {
             type: this.shapeType,
             points: line.points(),
@@ -16,7 +16,7 @@ export class LineFactory extends ShapeFactory<Konva.Line, Line> {
         }
     }
 
-    override toKonva(line: Partial<Line>): Konva.Line {
+    override toKonva(line: Partial<LineData>): Konva.Line {
         return this.createKonvaShape(new Konva.Line({
             points: line.points,
             fill: line.fill,

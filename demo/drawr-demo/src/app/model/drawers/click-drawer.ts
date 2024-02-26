@@ -1,10 +1,10 @@
 import Konva from "konva";
 import { DrawingType } from '../drawing-type';
 import { Drawer } from './drawer';
-import { Shape, ShapeConfig, ShapeFactory } from "../shapes";
+import { ShapeData, ShapeConfig, ShapeFactory } from "../shapes";
 
 
-export abstract class ClickDrawer<KonvaShape extends Konva.Shape, S extends Shape>
+export abstract class ClickDrawer<KonvaShape extends Konva.Shape, S extends ShapeData>
  extends Drawer<KonvaShape, S> {
   drawingType = DrawingType.CLICK;
 

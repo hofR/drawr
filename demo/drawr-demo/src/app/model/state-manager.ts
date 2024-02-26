@@ -1,9 +1,9 @@
-import { Shape } from "./shapes/shape";
+import { ShapeData } from "./shapes/shape";
 
 export class StateManager {
-    private currentState: Shape[] = [];
-    private stateStack: Shape[][] = [];
-    private redoStack: Shape[][] = [];
+    private currentState: ShapeData[] = [];
+    private stateStack: ShapeData[][] = [];
+    private redoStack: ShapeData[][] = [];
     private readonly maxCount = 100;
 
     constructor() { }
@@ -16,7 +16,7 @@ export class StateManager {
      * 
      * @param state Array of shapes that represent the state
      */
-    save(state: Shape[]): void {
+    save(state: ShapeData[]): void {
         if (this.stateStack.length === this.maxCount) {
             //Drop the oldest element
             this.stateStack.shift();
@@ -40,7 +40,7 @@ export class StateManager {
      * 
      * @returns the previous state or undefined if no state is stored 
      */
-    undo(): Shape[] | undefined {
+    undo(): ShapeData[] | undefined {
         if (!this.canUndo()) {
             return;
         }
@@ -66,7 +66,7 @@ export class StateManager {
      * 
      * @returns the new state or undefined if there is nothing to redo
      */
-    redo(): Shape[] | undefined {
+    redo(): ShapeData[] | undefined {
         if (!this.canRedo()) {
             return;
         }
@@ -87,7 +87,7 @@ export class StateManager {
         return this.redoStack.length > 0;
     }
 
-    private applyState(stack: Shape[][], newState: Shape[]): Shape[] {
+    private applyState(stack: ShapeData[][], newState: ShapeData[]): ShapeData[] {
         //Push the current state
         stack.push(this.currentState);
 

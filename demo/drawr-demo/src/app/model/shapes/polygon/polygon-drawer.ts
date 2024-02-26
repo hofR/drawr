@@ -1,10 +1,10 @@
 import Konva from "konva";
 import { ClickDrawer } from '../../drawers/click-drawer';
 import { ShapeConfig } from "../shape";
-import { Polygon, PolygonFactory } from "..";
+import { PolygonData, PolygonFactory } from "..";
 
 
-export class PolygonDrawer extends ClickDrawer<Konva.Line, Polygon> {
+export class PolygonDrawer extends ClickDrawer<Konva.Line, PolygonData> {
 
   constructor(factory: PolygonFactory) {
     super(factory);
