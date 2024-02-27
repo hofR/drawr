@@ -44,6 +44,14 @@ export abstract class Shape<KonvaShape extends Konva.Shape = Konva.Shape, Data e
         this.shape.visible(visible);
     }
 
+    get draggable(): boolean {
+        return this.shape.draggable();
+    }
+
+    set draggable(draggable: boolean) {
+        this.shape.draggable(draggable);
+    }
+
     get fill(): string {
         return this.shape.fill();
     }

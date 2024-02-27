@@ -117,16 +117,16 @@ export class DrawingEditor {
     public enableDrag(): void {
         this.isDragActive = true;
         this.director.dispose();
-        this.layer.getChildren().forEach(shape => {
-            shape.draggable(true);
-        });
+        this.queryHelper
+            .findAll()
+            .forEach(shape => shape.draggable = true)
     }
 
     public disableDrag(): void {
         this.isDragActive = false;
-        this.layer.getChildren().forEach(shape => {
-            shape.draggable(false);
-        });
+        this.queryHelper
+            .findAll()
+            .forEach(shape => shape.draggable = false)
     }
 
     public changeFill(color: string): void {
@@ -143,12 +143,6 @@ export class DrawingEditor {
             .forEach((shape) => shape.delete());
 
         this.selectedIds = this.selectionHandler?.updateSelection([]) ?? []
-    }
-
-    public removeByNames(names: string[]): void {
-        this.layer
-            .find((node: Konva.Node) => names.includes(node.name()))
-            .forEach((node) => node.destroy());
     }
 
     /**
