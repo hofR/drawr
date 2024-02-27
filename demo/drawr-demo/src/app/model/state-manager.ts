@@ -1,4 +1,4 @@
-import { ShapeData } from "./shapes/shape";
+import { ShapeData } from "./shapes/shape.data";
 
 export class StateManager {
     private currentState: ShapeData[] = [];

@@ -1,6 +1,7 @@
 import Konva from "konva";
 import { ClickDrawer } from '../../drawers/click-drawer';
-import { ShapeConfig, ShapeType } from "../shape";
+import { ShapeType } from "../shape.type";
+import { ShapeConfig } from "../shape.config";
 
 export class PolygonDrawer extends ClickDrawer<Konva.Line> {
   override shapeType: ShapeType = 'POLYGON'
@@ -12,12 +13,8 @@ export class PolygonDrawer extends ClickDrawer<Konva.Line> {
   ): Konva.Line 
   {
     return new Konva.Line({
-      id: this.getId(),
-      name: this.shapeType,
+      ...this.getShapeConfig(config),
       points: [x, y],
-      fill: config.fill,
-      stroke: config.stroke,
-      strokeWidth: config.strokeWidth,
     });
   }
 

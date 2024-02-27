@@ -1,2 +1,3 @@
 export * from './polygon';
-export * from './polygon-drawer';
+export * from './polygon.data';
+export * from './polygon.drawer';

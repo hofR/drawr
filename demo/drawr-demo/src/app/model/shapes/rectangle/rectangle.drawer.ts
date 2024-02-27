@@ -11,13 +11,9 @@ export class RectangleDrawer extends MoveDrawer<Konva.Rect> {
     config: ShapeConfig
   ): Konva.Rect {
     return new Konva.Rect({
-      id: this.getId(),
-      name: this.shapeType,
+      ...this.getShapeConfig(config),
       x: x,
       y: y,
-      fill: config.fill,
-      stroke: config.stroke,
-      strokeWidth: config.strokeWidth,
     });
   }
 

@@ -1,29 +1,16 @@
 import Konva from "konva";
-import { ShapeDataMapper } from "./mapper";
-
-export interface ShapeConfig {
-    fill?: string,
-    stroke?: string,
-    strokeWidth?: number
-}
-
-export interface ShapeData extends ShapeConfig {
-    type: ShapeType
-    fill: string,
-    stroke: string,
-    strokeWidth: number
-}
-
-export type ShapeType = 'RECTANGLE' | 'LINE' | 'POLYGON';
+import { ShapeData } from "./shape.data";
+import { ShapeConfig } from "./shape.config";
+import { ShapeType } from "./shape.type";
 
 /**
  * Proxy object to encapsulate access to Konva.Shape outside of the library
  */
-export class Shape<KonvaShape extends Konva.Shape = Konva.Shape> {
+export abstract class Shape<KonvaShape extends Konva.Shape = Konva.Shape, Data extends ShapeData = ShapeData> {
 
-    constructor(
-        protected readonly shape: KonvaShape
-    ) { }
+    constructor(protected readonly shape: KonvaShape) { }
+
+    protected abstract mapToData(): Data;
 
     get id(): string {
         return this.shape.id();
@@ -91,7 +78,14 @@ export class Shape<KonvaShape extends Konva.Shape = Konva.Shape> {
         this.strokeWidth = config.strokeWidth ?? this.shape.strokeWidth();
     }
 
-    toData(): ShapeData {
-        return new ShapeDataMapper().map(this);
+    toData(): Data {
+        return this.mapToData();
+    }
+
+    protected shapeData: ShapeData = {
+        type: this.type,
+        fill: this.fill,
+        stroke: this.stroke,
+        strokeWidth: this.strokeWidth
     }
 }

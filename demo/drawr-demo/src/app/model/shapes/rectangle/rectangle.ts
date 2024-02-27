@@ -1,16 +1,20 @@
 import Konva from "konva";
 import { Shape } from "../shape";
-import { RectangleDataMapper } from "./mapper/rectangle-data.mapper";
 import { RectangleData } from "./rectangle.data";
 
-export class Rectangle extends Shape<Konva.Rect> {
+export class Rectangle extends Shape<Konva.Rect, RectangleData> {
 
     constructor(rectangle: Konva.Rect) {
         super(rectangle);
     }
-   
-    override toData(): RectangleData {
-        return new RectangleDataMapper().map(this);
-    }
 
+    override mapToData(): RectangleData {
+        return {
+            x: this.x,
+            y: this.y,
+            width: this.width,
+            height: this.height,
+            ...this.shapeData
+        };
+    }
 }

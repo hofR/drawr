@@ -1,12 +1,8 @@
 import Konva from "konva";
-import { Shape, ShapeData } from "../shape";
-import { LineDataMapper } from "../mapper";
+import { Shape } from "../shape";
+import { LineData } from "..";
 
-export interface LineData extends ShapeData {
-    points: number[];
-}
-
-export class Line extends Shape<Konva.Line> {
+export class Line extends Shape<Konva.Line, LineData> {
 
     constructor(line: Konva.Line) {
         super(line);
@@ -15,8 +11,11 @@ export class Line extends Shape<Konva.Line> {
     get points(): number[] {
         return this.shape.points();
     }
-   
-    override toData(): LineData {
-        return new LineDataMapper().map(this);
+
+    protected override mapToData(): LineData {
+        return {
+            points: this.points,
+            ...this.shapeData
+        }
     }
 }

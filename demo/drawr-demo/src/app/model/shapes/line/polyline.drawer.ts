@@ -1,6 +1,7 @@
 import Konva from "konva";
 import { MoveDrawer } from '../../drawers/move-drawer';
-import { ShapeConfig, ShapeType } from "../shape";
+import { ShapeType } from "../shape.type";
+import { ShapeConfig } from "../shape.config";
 
 export class PolyLineDrawer extends MoveDrawer<Konva.Line> {
   override shapeType: ShapeType = 'LINE';
@@ -11,10 +12,8 @@ export class PolyLineDrawer extends MoveDrawer<Konva.Line> {
     config: ShapeConfig
   ): Konva.Line {
     return new Konva.Line({
+      ...this.getShapeConfig(config),
       points: [x, y],
-      fill: config.fill,
-      stroke: config.stroke,
-      strokeWidth: config.strokeWidth,
     });
   }
 

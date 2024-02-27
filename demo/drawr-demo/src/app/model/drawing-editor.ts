@@ -7,14 +7,14 @@ import { DrawingDirector } from './directors/drawing-director';
 import { MoveDrawingDirector } from './directors/move-drawing-director';
 import { ClickDrawer } from './drawers/click-drawer';
 import { Drawer } from './drawers/drawer';
-import { PolygonDrawer } from './shapes/polygon/polygon-drawer';
-import { PolyLineDrawer } from './shapes/line/polyline-drawer';
-import { RectangleDrawer } from './shapes/rectangle/rectangle-drawer';
+import { PolygonDrawer } from './shapes/polygon/polygon.drawer';
+import { PolyLineDrawer } from './shapes/line/polyline.drawer';
+import { RectangleDrawer } from './shapes/rectangle/rectangle.drawer';
 import { SelectionHandler } from "./selection-handler";
 import { StateManager } from "./state-manager";
 import { ShapeData, ShapeConfig, ShapeType, Shape } from "./shapes";
 import { QueryHelper } from "./query-helper";
-import { KonvaShapeMapper } from "./shapes/mapper";
+import { ShapeFactory } from "./shape.factory";
 
 export class DrawingEditor {
     onSelect?: (ids: string[]) => void;
@@ -273,19 +273,8 @@ export class DrawingEditor {
     }
 
     private addShapes(shapes: ShapeData[]): void {
-        const konvaShapes = shapes.map((shape: ShapeData) => {
-            //let factory = this.factoryMap[shape.type];
-            const dict: Record<ShapeType, typeof Konva.Shape> = {
-                "LINE": Konva.Line,
-                "RECTANGLE": Konva.Rect,
-                "POLYGON": Konva.Line
-            };
-
-            return KonvaShapeMapper.map<ShapeData, Konva.Shape>(shape, dict[shape.type], shape.type)
-        });
-
-        konvaShapes.forEach((shape) => {
-            this.layer.add(shape);
-        });
+        shapes
+            .map(ShapeFactory.createKonvaShape)
+            .forEach(shape => this.layer.add(shape));
     }
 }
