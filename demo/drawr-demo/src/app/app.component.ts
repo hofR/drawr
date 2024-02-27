@@ -4,6 +4,7 @@ import { RouterOutlet } from '@angular/router';
 import { DrawingEditor } from './model/drawing-editor';
 import { DrawingMode } from './model/drawing-mode';
 import { ShapeData } from "./model/shapes/shape.data";
+import { Shape } from './model/shapes';
 
 @Component({
   selector: 'app-root',
@@ -18,7 +19,7 @@ export class AppComponent implements OnInit {
   editor?: DrawingEditor;
   DrawerType = DrawingMode;
   shapes?: ShapeData[];
-  selected: string[] = [];
+  selected: Shape[] = [];
 
   ngOnInit(): void {
     this.initKonva()
@@ -26,7 +27,10 @@ export class AppComponent implements OnInit {
 
   initKonva() {
     this.editor = new DrawingEditor('container', window.innerWidth, window.innerHeight);
-    this.editor.onSelect = (ids) => {this.selected = ids}
+    this.editor.onSelect = (shapes) => {
+      this.selected = shapes;
+      console.log(this.selected)
+    }
   }
 
   changeTool(type: DrawingMode) {
@@ -57,10 +61,6 @@ export class AppComponent implements OnInit {
   onColorChanged(event: Event) {
     const color = (event.target as HTMLInputElement).value;
     this.editor?.changeFill(color);
-
-    if(this.selected.length > 0) {
-      this.editor?.updateShapeConfig({fill: color}, ...this.selected)
-    }
   }
 
   onDelete() {

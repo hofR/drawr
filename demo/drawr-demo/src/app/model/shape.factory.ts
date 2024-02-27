@@ -1,14 +1,14 @@
 import Konva from "konva";
 import { IdHelper } from "./id-helper";
-import { Line, Polygon, Rectangle, Shape, ShapeData, ShapeType } from "./shapes";
+import { Line, Polygon, Rectangle, Shape, ShapeData, ShapeState, ShapeType } from "./shapes";
 
 export class ShapeFactory {
 
-    static createShape(node: Konva.Node): Shape {
+    static createShape(node: Konva.Node, state?: ShapeState): Shape {
         const shapeMapping: Record<ShapeType, (shape: Konva.Shape) => Shape> = {
-            "LINE": (shape) => new Line(shape as Konva.Line),
-            "RECTANGLE": (shape) => new Rectangle(shape as Konva.Rect),
-            "POLYGON": (shape) => new Polygon(shape as Konva.Line)
+            "LINE": (shape) => new Line(shape as Konva.Line, state),
+            "RECTANGLE": (shape) => new Rectangle(shape as Konva.Rect, state),
+            "POLYGON": (shape) => new Polygon(shape as Konva.Line, state)
         };
 
         return shapeMapping[node.name() as ShapeType](node as Konva.Shape);

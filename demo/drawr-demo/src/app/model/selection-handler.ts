@@ -1,10 +1,12 @@
 import Konva from 'konva';
+import { Shape } from './shapes';
+import { ShapeFactory } from './shape.factory';
 
 /**
  * Stolen from https://konvajs.org/docs/select_and_transform/Basic_demo.html
  */
 export class SelectionHandler {
-    onSelect?: (ids: string[]) => void;
+    onSelect?: (shapes: Shape[]) => void;
 
     private selecting = false;
     private readonly selectionRectangle = new Konva.Rect({
@@ -27,7 +29,9 @@ export class SelectionHandler {
     }
 
     public dispose(): void {
-        this.updateSelection([]);
+        if(this.getSelectedShapes().length > 0) {
+            this.updateSelection([]);
+        }
 
         this.layer
             .findOne((node: Konva.Node) => node.hasName(this.selectionRectangle.name()))
@@ -62,6 +66,11 @@ export class SelectionHandler {
 
     public getSelectedIds(): string[] {
         return this.transformer.nodes().map((node) => node.id());
+    }
+
+    public getSelectedShapes(): Shape[] {
+        return this.transformer.nodes()
+            .map(node => ShapeFactory.createShape(node, {selected: true}));
     }
 
     protected handleMouseDown(mouseEvent: Konva.KonvaEventObject<MouseEvent>): void {
@@ -154,7 +163,7 @@ export class SelectionHandler {
 
     private fireOnSelect(): void {
         if (this.onSelect) {
-            this.onSelect(this.getSelectedIds());
+            this.onSelect(this.getSelectedShapes());
         }
     }
 }

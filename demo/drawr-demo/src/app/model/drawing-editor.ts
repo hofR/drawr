@@ -17,9 +17,7 @@ import { QueryHelper } from "./query-helper";
 import { ShapeFactory } from "./shape.factory";
 
 export class DrawingEditor {
-    onSelect?: (ids: string[]) => void;
-
-    selectedIds: string[] = [];
+    onSelect?: (shapes: Shape[]) => void;
 
     private readonly stage: Konva.Stage;
     private readonly layer: Konva.Layer;
@@ -75,7 +73,6 @@ export class DrawingEditor {
 
         this.selectionHandler = new SelectionHandler(this.stage, this.layer);
         this.selectionHandler.onSelect = (selected) => {
-            this.selectedIds = selected;
             if (this.onSelect) {
                 this.onSelect(selected);
             }
@@ -139,10 +136,10 @@ export class DrawingEditor {
 
     public deleteSelected() {
         this.queryHelper
-            .findById(this.selectedIds)
+            .findAllSelected()
             .forEach((shape) => shape.delete());
 
-        this.selectedIds = this.selectionHandler?.updateSelection([]) ?? []
+        this.selectionHandler?.updateSelection([]) ?? []
     }
 
     /**

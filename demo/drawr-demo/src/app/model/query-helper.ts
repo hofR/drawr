@@ -9,12 +9,18 @@ export class QueryHelper {
     findAll(): Shape[] {
         return this.layer
             .find((node: Konva.Node) => node.id().startsWith('drawr'))
-            .map(ShapeFactory.createShape);
+            .map(node => ShapeFactory.createShape(node));
     }
 
     findById(ids: string[]): Shape[] {
         return this.layer
             .find((node: Konva.Node) => ids.includes(node.id()))
-            .map(ShapeFactory.createShape);
+            .map(node => ShapeFactory.createShape(node));
+    }
+
+    findAllSelected(): Shape[] {
+        return this
+            .findAll()
+            .filter(shape => shape.selected);
     }
 }

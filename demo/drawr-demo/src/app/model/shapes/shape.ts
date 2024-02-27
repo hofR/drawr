@@ -3,12 +3,19 @@ import { ShapeData } from "./shape.data";
 import { ShapeConfig } from "./shape.config";
 import { ShapeType } from "./shape.type";
 
+export interface ShapeState {
+    selected: boolean
+}
+
 /**
  * Proxy object to encapsulate access to Konva.Shape outside of the library
  */
 export abstract class Shape<KonvaShape extends Konva.Shape = Konva.Shape, Data extends ShapeData = ShapeData> {
+    private isSelected = false;
 
-    constructor(protected readonly shape: KonvaShape) { }
+    constructor(protected readonly shape: KonvaShape, state?: ShapeState) {
+        this.isSelected = state?.selected ?? false;
+    }
 
     protected abstract mapToData(): Data;
 
@@ -76,7 +83,24 @@ export abstract class Shape<KonvaShape extends Konva.Shape = Konva.Shape, Data e
         this.shape.strokeWidth(strokeWidth);
     }
 
+    get selected(): boolean {
+        return this.isSelected;
+    }
+
+    set selected(selected: boolean) {
+        this.isSelected = selected;
+    }
+
+    select() {
+        this.isSelected = true;
+    }
+
+    deselect() {
+        this.isSelected = false;
+    }
+
     delete(): void {
+        console.log("Destroying shape!!")
         this.shape.destroy();
     }
 

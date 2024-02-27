@@ -1,11 +1,11 @@
 import Konva from "konva";
-import { Shape } from "../shape";
+import { Shape, ShapeState } from "../shape";
 import { LineData } from "..";
 
 export class Line extends Shape<Konva.Line, LineData> {
 
-    constructor(line: Konva.Line) {
-        super(line);
+    constructor(line: Konva.Line, state?: ShapeState) {
+        super(line, state);
     }
 
     get points(): number[] {
