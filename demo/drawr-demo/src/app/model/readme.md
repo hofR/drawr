@@ -13,3 +13,7 @@
     - e.g. all shapes on layer
 - Toggle visibility of shapes
 - handling of scale and rotate
+
+# Design Decisions
+
+- All operations that modify the internal state (e.g. deletion, copy) can only be performed by the API provided from the drawing-editor

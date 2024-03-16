@@ -3,6 +3,7 @@ import { KonvaEventObject } from 'konva/lib/Node';
 import { ClickDrawer } from '../drawers/click-drawer';
 import { DrawingDirector } from './drawing-director';
 import { ShapeConfig } from "../shapes";
+import { LayerFacade } from "../shapes/layer-proxy";
 
 
 export class ClickDrawingDirector<KonvaShape extends Konva.Shape>
@@ -12,7 +13,7 @@ export class ClickDrawingDirector<KonvaShape extends Konva.Shape>
 
   constructor(
     stage: Konva.Stage,
-    layer: Konva.Layer,
+    layer: LayerFacade,
     drawer: ClickDrawer<KonvaShape>,
     shapeConfig: ShapeConfig
   ) {

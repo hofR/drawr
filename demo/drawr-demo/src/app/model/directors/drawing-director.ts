@@ -2,7 +2,7 @@ import Konva from "konva";
 import { KonvaEventObject } from 'konva/lib/Node';
 import { Drawer } from '../drawers/drawer';
 import { ShapeConfig } from "../shapes/shape.config";
-import { ShapeData } from "../shapes/shape.data";
+import { LayerFacade } from "../shapes/layer-proxy";
 
 export abstract class DrawingDirector<
   KonvaShape extends Konva.Shape = Konva.Shape,
@@ -14,7 +14,7 @@ export abstract class DrawingDirector<
 
   constructor(
     protected readonly stage: Konva.Stage,
-    protected readonly layer: Konva.Layer,
+    protected readonly layer: LayerFacade,
     protected readonly drawer: DrawerType,
     protected readonly shapeConfig: ShapeConfig,
   ) {

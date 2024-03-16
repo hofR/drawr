@@ -13,17 +13,15 @@ import { RectangleDrawer } from './shapes/rectangle/rectangle.drawer';
 import { SelectionHandler } from "./selection-handler";
 import { StateManager } from "./state-manager";
 import { ShapeData, ShapeConfig, ShapeType, Shape } from "./shapes";
-import { QueryHelper } from "./query-helper";
 import { ShapeFactory } from "./shape.factory";
+import { LayerFacade } from "./shapes/layer-proxy";
 
 export class DrawingEditor {
     onSelect?: (shapes: Shape[]) => void;
 
     private readonly stage: Konva.Stage;
-    private readonly layer: Konva.Layer;
     private readonly selectionHandler?: SelectionHandler;
     private readonly stateManager: StateManager;
-    private readonly queryHelper: QueryHelper;
 
     private director: DrawingDirector;
 
@@ -48,6 +46,8 @@ export class DrawingEditor {
         'POLYGON': new PolygonDrawer(),
     }
 
+    private readonly layerProxy: LayerFacade;
+
     get isDragEnabled(): boolean {
         return this.isDragActive;
     }
@@ -68,25 +68,32 @@ export class DrawingEditor {
         });
 
         // add canvas element
-        this.layer = new Konva.Layer();
-        this.stage.add(this.layer);
+        const layer = new Konva.Layer();
+        this.stage.add(layer);
 
-        this.selectionHandler = new SelectionHandler(this.stage, this.layer);
-        this.selectionHandler.onSelect = (selected) => {
+        this.selectionHandler = new SelectionHandler(this.stage, layer);
+        this.selectionHandler.onSelect = (selected) => {            
             if (this.onSelect) {
-                this.onSelect(selected);
+                console.log(selected)
+                this.onSelect(this.layerProxy.updateSelection(...selected));
             }
+        }
+
+        this.layerProxy = new LayerFacade(layer);
+        this.layerProxy.onLayerChanged = (shapes) => {
+            console.log("BLABLA")
+            console.log(shapes)
+            this.selectionHandler?.updateSelectionById(...this.layerProxy.findSelected().map(shape => shape.id))
         }
 
         this.director = new MoveDrawingDirector(
             this.stage,
-            this.layer,
+            this.layerProxy,
             new RectangleDrawer(),
             this.shapeConfig,
         );
 
         this.stateManager = new StateManager();
-        this.queryHelper = new QueryHelper(this.layer);
     }
 
 
@@ -114,14 +121,14 @@ export class DrawingEditor {
     public enableDrag(): void {
         this.isDragActive = true;
         this.director.dispose();
-        this.queryHelper
+        this.layerProxy
             .findAll()
             .forEach(shape => shape.draggable = true)
     }
 
     public disableDrag(): void {
         this.isDragActive = false;
-        this.queryHelper
+        this.layerProxy
             .findAll()
             .forEach(shape => shape.draggable = false)
     }
@@ -135,10 +142,7 @@ export class DrawingEditor {
     }
 
     public deleteSelected() {
-        this.queryHelper
-            .findAllSelected()
-            .forEach((shape) => shape.delete());
-
+        this.layerProxy.deleteSelected();
         this.selectionHandler?.updateSelection([]) ?? []
     }
 
@@ -148,7 +152,7 @@ export class DrawingEditor {
      * @returns Array of Shapes
      */
     public export(): ShapeData[] {
-        const shapes = this.queryHelper.findAll();
+        const shapes = this.layerProxy.findAll();
         return shapes.map((shape) => {
             return shape.toData();
         });
@@ -158,7 +162,7 @@ export class DrawingEditor {
      * Clears all shapes
      */
     public clear(): void {
-        this.queryHelper.findAll().forEach((shape) => shape.delete())
+        this.layerProxy.clear();
         this.selectionHandler?.updateSelection([]);
     }
 
@@ -225,7 +229,7 @@ export class DrawingEditor {
      * @param ids of the shapes that should be updated
      */
     public updateShapeConfig(config: ShapeConfig, ...ids: string[]): void {
-        const shapes = this.queryHelper.findById(ids);
+        const shapes = this.layerProxy.findById(ids);
         if (!shapes) {
             return;
         }
@@ -240,14 +244,14 @@ export class DrawingEditor {
         if (DrawingType.CLICK === drawer.drawingType) {
             director = new ClickDrawingDirector(
                 this.stage,
-                this.layer,
+                this.layerProxy,
                 drawer as ClickDrawer<Konva.Shape>,
                 this.shapeConfig
             );
         } else if (DrawingType.MOVE === drawer.drawingType) {
             director = new MoveDrawingDirector(
                 this.stage,
-                this.layer,
+                this.layerProxy,
                 drawer,
                 this.shapeConfig
             );
@@ -264,8 +268,6 @@ export class DrawingEditor {
     }
 
     private addShapes(shapes: ShapeData[]): void {
-        shapes
-            .map(ShapeFactory.createKonvaShape)
-            .forEach(shape => this.layer.add(shape));
+        this.layerProxy.add(...shapes.map(ShapeFactory.createKonvaShape));
     }
 }

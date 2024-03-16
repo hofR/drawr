@@ -14,7 +14,6 @@ import { Shape } from './model/shapes';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-
   title = 'drawr-demo';
   editor?: DrawingEditor;
   DrawerType = DrawingMode;
@@ -64,12 +63,18 @@ export class AppComponent implements OnInit {
   }
 
   onDelete() {
+    //this.selected.at(0)?.delete();
+
     this.editor?.deleteSelected();
+  }
+
+  onClear() {
+    this.editor?.clear()
   }
 
   export() {
     this.shapes = this.editor?.export();
- }
+  }
 
   import() {
     console.log(this.shapes)

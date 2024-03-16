@@ -1,12 +1,10 @@
 import Konva from 'konva';
-import { Shape } from './shapes';
-import { ShapeFactory } from './shape.factory';
 
 /**
  * Stolen from https://konvajs.org/docs/select_and_transform/Basic_demo.html
  */
 export class SelectionHandler {
-    onSelect?: (shapes: Shape[]) => void;
+    onSelect?: (ids: string[]) => void;
 
     private selecting = false;
     private readonly selectionRectangle = new Konva.Rect({
@@ -29,7 +27,7 @@ export class SelectionHandler {
     }
 
     public dispose(): void {
-        if(this.getSelectedShapes().length > 0) {
+        if(this.getSelectedIds().length > 0) {
             this.updateSelection([]);
         }
 
@@ -64,13 +62,17 @@ export class SelectionHandler {
         return selectedIds;
     }
 
-    public getSelectedIds(): string[] {
-        return this.transformer.nodes().map((node) => node.id());
+    public updateSelectionById(...ids: string[]): string[] {
+        const nodes = this.layer.find((node: Konva.Node) => ids.includes(node.id()));
+        this.transformer.nodes(nodes);
+        const selectedIds = this.getSelectedIds();
+        this.fireOnSelect();
+
+        return selectedIds;
     }
 
-    public getSelectedShapes(): Shape[] {
-        return this.transformer.nodes()
-            .map(node => ShapeFactory.createShape(node, {selected: true}));
+    public getSelectedIds(): string[] {
+        return this.transformer.nodes().map((node) => node.id());
     }
 
     protected handleMouseDown(mouseEvent: Konva.KonvaEventObject<MouseEvent>): void {
@@ -134,6 +136,7 @@ export class SelectionHandler {
         // if click on empty area - remove all selections
         if (mouseEvent.target === this.stage) {
             this.transformer.nodes([]);
+            this.fireOnSelect();
             return;
         }
 
@@ -163,7 +166,7 @@ export class SelectionHandler {
 
     private fireOnSelect(): void {
         if (this.onSelect) {
-            this.onSelect(this.getSelectedShapes());
+            this.onSelect(this.getSelectedIds());
         }
     }
 }
