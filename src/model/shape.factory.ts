@@ -1,6 +1,6 @@
 import Konva from "konva";
 import { IdHelper } from "./id-helper";
-import { Line, Polygon, Rectangle, Shape, ShapeData, ShapeType } from "./shapes";
+import { Line, Polygon, Rectangle, Shape, ShapeData, ShapeType, LineData, RectangleData, PolygonData } from "./shapes";
 
 export class ShapeFactory {
 
@@ -22,9 +22,8 @@ export class ShapeFactory {
             "RECTANGLE": Konva.Rect,
             "POLYGON": Konva.Line
         };
-        
-        const type = shape.type;
 
+        const type = shape.type;
         return new shapeMapping[type](
             {
                 id: IdHelper.getId(),

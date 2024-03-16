@@ -236,7 +236,7 @@ export class DrawingEditor {
 
 
     private createDirector(drawer: Drawer): DrawingDirector {
-        let director = undefined;
+        let director: DrawingDirector;
 
         if (DrawingType.CLICK === drawer.drawingType) {
             director = new ClickDrawingDirector(
