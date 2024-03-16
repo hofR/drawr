@@ -1,6 +1,7 @@
 import Konva from "konva";
 import { Shape } from "./shape";
 import { ShapeFactory } from "../shape.factory";
+import { Logger, logging } from "../logging/logger";
 
 export class ShapeCollection {
     private readonly shapes: Shape[] = []
@@ -19,12 +20,16 @@ export class ShapeCollection {
 
 export class LayerFacade {
     private readonly shapes: Shape[] = []
+    private readonly logger: Logger;
 
-    constructor(private readonly layer: Konva.Layer) { }
+    constructor(private readonly layer: Konva.Layer) { 
+        this.logger = logging.createLogger("LayerFacade");
+    }
 
     onLayerChanged?: (shapes: Shape[]) => void;
 
     add(...shapes: Konva.Shape[]) {
+        this.logger.log("Adding shape to stage")
         this.layer.add(...shapes)
         this.shapes.push(...shapes.map(shape => this.createShape(shape)));
         this.fireOnLayerChanged();
@@ -49,9 +54,17 @@ export class LayerFacade {
         const unselected = this.shapes.filter(shape => !ids.includes(shape.id));
 
         selected.forEach(shape => shape.select());
-        unselected.forEach(shape => shape.deselect());      
+        unselected.forEach(shape => shape.deselect());
 
         return this.findSelected();
+    }
+
+    enableDrag(): void {
+        this.shapes.forEach(shape => shape.draggable = true);
+    }
+
+    disableDrag(): void {
+        this.shapes.forEach(shape => shape.draggable = false);
     }
 
     findAll(): Shape[] {
@@ -84,7 +97,7 @@ export class LayerFacade {
     }
 
     private fireOnLayerChanged(): void {
-        if(this.onLayerChanged) {
+        if (this.onLayerChanged) {
             this.onLayerChanged(this.shapes);
         }
     }

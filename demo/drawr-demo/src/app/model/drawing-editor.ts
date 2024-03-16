@@ -15,9 +15,11 @@ import { StateManager } from "./state-manager";
 import { ShapeData, ShapeConfig, ShapeType, Shape } from "./shapes";
 import { ShapeFactory } from "./shape.factory";
 import { LayerFacade } from "./shapes/layer-proxy";
+import { logging } from "./logging/logger";
 
 export class DrawingEditor {
     onSelect?: (shapes: Shape[]) => void;
+    onLogMessage?: (message: string) => void;
 
     private readonly stage: Konva.Stage;
     private readonly selectionHandler?: SelectionHandler;
@@ -94,6 +96,12 @@ export class DrawingEditor {
         );
 
         this.stateManager = new StateManager();
+
+        logging.onLogMessage((message) => {
+            if(this.onLogMessage) {
+                this.onLogMessage(message);
+            }
+        })
     }
 
 
@@ -121,16 +129,12 @@ export class DrawingEditor {
     public enableDrag(): void {
         this.isDragActive = true;
         this.director.dispose();
-        this.layerProxy
-            .findAll()
-            .forEach(shape => shape.draggable = true)
+        this.layerProxy.enableDrag();
     }
 
     public disableDrag(): void {
         this.isDragActive = false;
-        this.layerProxy
-            .findAll()
-            .forEach(shape => shape.draggable = false)
+        this.layerProxy.disableDrag();
     }
 
     public changeFill(color: string): void {

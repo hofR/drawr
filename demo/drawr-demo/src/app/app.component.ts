@@ -30,6 +30,10 @@ export class AppComponent implements OnInit {
       this.selected = shapes;
       console.log(this.selected)
     }
+
+    this.editor.onLogMessage = (message) => {
+      console.log(message)
+    }
   }
 
   changeTool(type: DrawingMode) {
