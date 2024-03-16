@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { DrawingEditor } from './model/drawing-editor';
-import { DrawingMode } from './model/drawing-mode';
-import { ShapeData } from "./model/shapes/shape.data";
-import { Shape } from './model/shapes';
+import { DrawingEditor } from 'drawr';
+import { DrawingMode } from 'drawr';
+import { ShapeData } from 'drawr';
+import { Shape } from 'drawr';
 
 @Component({
   selector: 'app-root',
