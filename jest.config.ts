@@ -3,7 +3,7 @@
  * https://jestjs.io/docs/configuration
  */
 
-import type {Config} from 'jest';
+import type { Config } from 'jest';
 
 const config: Config = {
   // All imported modules in your tests should be mocked automatically
@@ -90,8 +90,9 @@ const config: Config = {
   // ],
 
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
-  // moduleNameMapper: {},
-
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+  },
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
   // modulePathIgnorePatterns: [],
 
@@ -126,9 +127,9 @@ const config: Config = {
   // rootDir: undefined,
 
   // A list of paths to directories that Jest should use to search for files in
-  // roots: [
-  //   "<rootDir>"
-  // ],
+  roots: [
+    "./src"
+  ],
 
   // Allows you to use a custom runner instead of Jest's default test runner
   // runner: "jest-runner",
@@ -146,7 +147,7 @@ const config: Config = {
   // snapshotSerializers: [],
 
   // The test environment that will be used for testing
-  testEnvironment: "jsdom",
+  testEnvironment: "node",
 
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},
@@ -175,7 +176,14 @@ const config: Config = {
   // testRunner: "jest-circus/runner",
 
   // A map from regular expressions to paths to transformers
-  // transform: undefined,
+  transform: {
+    '^.+\\.ts?$': [
+      'ts-jest',
+      {
+        useESM: true
+      }
+    ]
+  },
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
   // transformIgnorePatterns: [
@@ -194,6 +202,10 @@ const config: Config = {
 
   // Whether to use watchman for file crawling
   // watchman: true,
+
+  preset: 'ts-jest/presets/default-esm',
+
+  extensionsToTreatAsEsm: ['.ts'],
 };
 
 export default config;
