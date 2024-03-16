@@ -22,6 +22,7 @@ export class ShapeFactory {
             "RECTANGLE": Konva.Rect,
             "POLYGON": Konva.Line
         };
+        
         const type = shape.type;
 
         return new shapeMapping[type](
