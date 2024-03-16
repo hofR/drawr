@@ -14,7 +14,7 @@ import { SelectionHandler } from "./selection-handler";
 import { StateManager } from "./state-manager";
 import { ShapeData, ShapeConfig, ShapeType, Shape } from "./shapes";
 import { ShapeFactory } from "./shape.factory";
-import { LayerFacade } from "./shapes/layer-proxy";
+import { LayerFacade } from "./shapes/layer-facade";
 import { logging } from "./logging/logger";
 
 export class DrawingEditor {
@@ -22,7 +22,6 @@ export class DrawingEditor {
     onLogMessage?: (message: string) => void;
 
     private readonly stage: Konva.Stage;
-    private readonly selectionHandler?: SelectionHandler;
     private readonly stateManager: StateManager;
 
     private director: DrawingDirector;
@@ -69,23 +68,20 @@ export class DrawingEditor {
             height: height
         });
 
-        // add canvas element
         const layer = new Konva.Layer();
         this.stage.add(layer);
 
-        this.selectionHandler = new SelectionHandler(this.stage, layer);
-        this.selectionHandler.onSelect = (selected) => {            
+        const selectionHandler = new SelectionHandler(this.stage, layer);
+        selectionHandler.onSelect = (selected) => {
             if (this.onSelect) {
                 console.log(selected)
                 this.onSelect(this.layerProxy.updateSelection(...selected));
             }
         }
 
-        this.layerProxy = new LayerFacade(layer);
+        this.layerProxy = new LayerFacade(layer, selectionHandler);
         this.layerProxy.onLayerChanged = (shapes) => {
-            console.log("BLABLA")
-            console.log(shapes)
-            this.selectionHandler?.updateSelectionById(...this.layerProxy.findSelected().map(shape => shape.id))
+            selectionHandler?.updateSelectionById(...this.layerProxy.findSelected().map(shape => shape.id))
         }
 
         this.director = new MoveDrawingDirector(
@@ -98,19 +94,18 @@ export class DrawingEditor {
         this.stateManager = new StateManager();
 
         logging.onLogMessage((message) => {
-            if(this.onLogMessage) {
+            if (this.onLogMessage) {
                 this.onLogMessage(message);
             }
         })
     }
-
 
     public changeTool(type: DrawingMode): void {
         const drawer = this.drawers[type];
         console.log(drawer);
 
         this.director.dispose();
-        this.selectionHandler?.dispose();
+        this.disableSelection();
         this.disableDrag();
         this.director = this.createDirector(drawer);
     }
@@ -118,12 +113,12 @@ export class DrawingEditor {
     public enableSelection(): void {
         this.isSelectActive = true;
         this.director.dispose();
-        this.selectionHandler?.setup();
+        this.layerProxy.enableSelection();
     }
 
     public disableSelection(): void {
         this.isSelectActive = false;
-        this.selectionHandler?.dispose();
+        this.layerProxy.disableSelection();
     }
 
     public enableDrag(): void {
@@ -147,7 +142,6 @@ export class DrawingEditor {
 
     public deleteSelected() {
         this.layerProxy.deleteSelected();
-        this.selectionHandler?.updateSelection([]) ?? []
     }
 
     /**
@@ -167,7 +161,6 @@ export class DrawingEditor {
      */
     public clear(): void {
         this.layerProxy.clear();
-        this.selectionHandler?.updateSelection([]);
     }
 
     /**

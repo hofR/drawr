@@ -2,7 +2,7 @@ import Konva from "konva";
 import { KonvaEventObject } from 'konva/lib/Node';
 import { Drawer } from '../drawers/drawer';
 import { ShapeConfig } from "../shapes/shape.config";
-import { LayerFacade } from "../shapes/layer-proxy";
+import { LayerFacade } from "../shapes/layer-facade";
 
 export abstract class DrawingDirector<
   KonvaShape extends Konva.Shape = Konva.Shape,

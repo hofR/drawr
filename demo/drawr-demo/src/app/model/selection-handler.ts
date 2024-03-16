@@ -26,6 +26,16 @@ export class SelectionHandler {
         this.setup();
     }
 
+    public setup(): void {
+        this.layer.add(this.selectionRectangle);
+        this.layer.add(this.transformer);
+
+        this.stage.on('mousedown touchstart', (event) => this.handleMouseDown(event));
+        this.stage.on('mousemove touchmove', (event) => this.handleMouseMove(event));
+        this.stage.on('mouseup touchend', (event) => this.handleMouseUp(event));
+        this.stage.on('click tap', (event) => this.handleClick(event));
+    }
+
     public dispose(): void {
         if(this.getSelectedIds().length > 0) {
             this.updateSelection([]);
@@ -44,16 +54,6 @@ export class SelectionHandler {
         this.stage.removeEventListener('click tap');
     }
 
-    public setup(): void {
-        this.layer.add(this.selectionRectangle);
-        this.layer.add(this.transformer);
-
-        this.stage.on('mousedown touchstart', (event) => this.handleMouseDown(event));
-        this.stage.on('mousemove touchmove', (event) => this.handleMouseMove(event));
-        this.stage.on('mouseup touchend', (event) => this.handleMouseUp(event));
-        this.stage.on('click tap', (event) => this.handleClick(event));
-    }
-
     public updateSelection(nodes: Konva.Node[]): string[] {
         this.transformer.nodes(nodes);
         const selectedIds = this.getSelectedIds();
@@ -62,11 +62,15 @@ export class SelectionHandler {
         return selectedIds;
     }
 
+    public clearSelection(): void {
+        this.transformer.nodes([]);
+    }
+
     public updateSelectionById(...ids: string[]): string[] {
         const nodes = this.layer.find((node: Konva.Node) => ids.includes(node.id()));
         this.transformer.nodes(nodes);
         const selectedIds = this.getSelectedIds();
-        this.fireOnSelect();
+        //this.fireOnSelect();
 
         return selectedIds;
     }

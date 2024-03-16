@@ -3,7 +3,7 @@ import { KonvaEventObject } from 'konva/lib/Node';
 import { DrawingDirector } from './drawing-director';
 import { ShapeConfig } from "../shapes";
 import { MoveDrawer } from "../drawers/move-drawer";
-import { LayerFacade } from "../shapes/layer-proxy";
+import { LayerFacade } from "../shapes/layer-facade";
 
 
 export class MoveDrawingDirector<KonvaShape extends Konva.Shape> 

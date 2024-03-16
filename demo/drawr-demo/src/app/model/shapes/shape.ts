@@ -2,19 +2,32 @@ import Konva from "konva";
 import { ShapeData } from "./shape.data";
 import { ShapeConfig } from "./shape.config";
 import { ShapeType } from "./shape.type";
+import { Logger, logging } from "../logging/logger";
 
 export interface ShapeState {
     selected: boolean
 }
 
+export interface ShapeEvent {
+    shape: Shape;
+}
+
+interface ShapeEventMap {
+    'delete': CustomEvent<ShapeEvent>;
+    'selectionChange': CustomEvent<ShapeEvent>;
+}
+
 /**
  * Proxy object to encapsulate access to Konva.Shape outside of the library
  */
-export abstract class Shape<KonvaShape extends Konva.Shape = Konva.Shape, Data extends ShapeData = ShapeData> {
+export abstract class Shape<KonvaShape extends Konva.Shape = Konva.Shape, Data extends ShapeData = ShapeData> extends EventTarget {
     private isSelected = false;
+    private logger: Logger;
 
     constructor(protected readonly shape: KonvaShape, state?: ShapeState) {
+        super();
         this.isSelected = state?.selected ?? false;
+        this.logger = logging.createLogger(this.id);
     }
 
     protected abstract mapToData(): Data;
@@ -93,15 +106,19 @@ export abstract class Shape<KonvaShape extends Konva.Shape = Konva.Shape, Data e
 
     select() {
         this.isSelected = true;
+        this.dispatchEvent(this.getEvent('selectionChange'))
     }
 
     deselect() {
         this.isSelected = false;
+        this.dispatchEvent(this.getEvent('selectionChange'))
     }
 
     delete(): void {
-        console.log("Destroying shape!!")
+        this.logger.log(`Destroying shape: ${this.id}`)
         this.shape.destroy();
+        this.deselect();
+        this.dispatchEvent(this.getEvent('delete'))
     }
 
     updateConfig(config: ShapeConfig): void {
@@ -114,10 +131,22 @@ export abstract class Shape<KonvaShape extends Konva.Shape = Konva.Shape, Data e
         return this.mapToData();
     }
 
+    on<T extends keyof ShapeEventMap>(
+        type: T,
+        listener: (this: Shape, ev: ShapeEventMap[T]) => any,
+        options?: boolean | AddEventListenerOptions
+    ): void {
+        this.addEventListener(type, listener as EventListener, options)
+    }
+
     protected shapeData: ShapeData = {
         type: this.type,
         fill: this.fill,
         stroke: this.stroke,
         strokeWidth: this.strokeWidth
+    }
+
+    private getEvent(type: keyof ShapeEventMap): CustomEvent {
+        return new CustomEvent(type, { detail: { shape: this.shape } });
     }
 }

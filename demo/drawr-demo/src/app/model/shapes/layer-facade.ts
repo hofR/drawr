@@ -2,6 +2,7 @@ import Konva from "konva";
 import { Shape } from "./shape";
 import { ShapeFactory } from "../shape.factory";
 import { Logger, logging } from "../logging/logger";
+import { SelectionHandler } from "../selection-handler";
 
 export class ShapeCollection {
     private readonly shapes: Shape[] = []
@@ -22,7 +23,10 @@ export class LayerFacade {
     private readonly shapes: Shape[] = []
     private readonly logger: Logger;
 
-    constructor(private readonly layer: Konva.Layer) { 
+    constructor(
+        private readonly layer: Konva.Layer,
+        private readonly selectionHandler: SelectionHandler
+    ) {
         this.logger = logging.createLogger("LayerFacade");
     }
 
@@ -35,18 +39,25 @@ export class LayerFacade {
         this.fireOnLayerChanged();
     }
 
+    /**
+     * Deletes all shapes that are currently selected
+     */
     deleteSelected() {
         const selected = this.findSelected();
+        this.selectionHandler?.updateSelection([]);
         this.delete(...selected);
     }
 
-    delete(...shapes: Shape[]) {
-        shapes.forEach((shape) => shape.delete())
-        this.remove(...shapes);
-    }
-
+    /**
+     * Deletes all shapes on the layer and resets active selections
+     */
     clear(): void {
         this.delete(...this.shapes);
+        this.selectionHandler.clearSelection();
+    }
+
+    private delete(...shapes: Shape[]) {
+        shapes.forEach((shape) => shape.delete())
     }
 
     updateSelection(...ids: string[]): Shape[] {
@@ -59,13 +70,34 @@ export class LayerFacade {
         return this.findSelected();
     }
 
+    /**
+     * Enables drag for all shapes on the layer
+     */
     enableDrag(): void {
         this.shapes.forEach(shape => shape.draggable = true);
     }
 
+    /**
+     * Disables drag for all shapes on the layer
+     */
     disableDrag(): void {
         this.shapes.forEach(shape => shape.draggable = false);
     }
+
+    /**
+     * Enables selection of shapes on the layer
+     */
+    enableSelection() {
+        this.selectionHandler?.setup();
+    }
+
+    /**
+     * Disables selection of shapes on the layer
+     */
+    disableSelection() {
+        this.selectionHandler?.dispose();
+    }
+
 
     findAll(): Shape[] {
         return this.shapes;
@@ -93,6 +125,16 @@ export class LayerFacade {
     private createShape(node: Konva.Node): Shape {
         //TODO FIX DELETION AND SELECTION UPDATE
         const shape = ShapeFactory.createShape(node);
+        
+        shape.on('delete', (event) => {
+            this.remove(event.detail.shape)
+        });
+
+        shape.on('selectionChange', (event) => {
+            this.selectionHandler.updateSelectionById(...this.findSelected().map(shape => shape.id))
+            //this.fireOnLayerChanged();
+        })
+
         return shape;
     }
 
