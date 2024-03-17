@@ -19,6 +19,9 @@ export class ShapeCollection {
     }
 }
 
+/**
+ * Facade to encapsulate access to Konva.Layer
+ */
 export class LayerFacade {
     private readonly shapes: Shape[] = []
     private readonly logger: Logger;

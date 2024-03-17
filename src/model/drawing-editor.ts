@@ -10,13 +10,12 @@ import { Drawer } from './drawers/drawer';
 import { PolygonDrawer } from './shapes/polygon/polygon.drawer';
 import { PolyLineDrawer } from './shapes/line/polyline.drawer';
 import { RectangleDrawer } from './shapes/rectangle/rectangle.drawer';
-import { SelectionHandler } from "./selection-handler";
 import { StateManager } from "./state-manager";
 import { ShapeData, ShapeConfig, ShapeType, Shape } from "./shapes";
 import { ShapeFactory } from "./shape.factory";
 import { LayerFacade } from "./shapes/layer-facade";
 import { logging } from "./logging/logger";
-import { IdHelper } from "./id-helper";
+import { LayerService } from "./layer.service";
 
 export class DrawingEditor {
     onSelect?: (shapes: Shape[]) => void;
@@ -48,8 +47,7 @@ export class DrawingEditor {
         'POLYGON': new PolygonDrawer(),
     }
 
-    private readonly layers: Record<string, LayerFacade> = {};
-    private activeLayerId?: string;
+    private readonly layerService: LayerService;
 
     get isDragEnabled(): boolean {
         return this.isDragActive;
@@ -74,6 +72,8 @@ export class DrawingEditor {
         this.director = this.createDirector(new RectangleDrawer());
         this.stateManager = new StateManager();
 
+        this.layerService = new LayerService(this.stage);
+
         logging.onLogMessage((message) => {
             if (this.onLogMessage) {
                 this.onLogMessage(message);
@@ -81,45 +81,20 @@ export class DrawingEditor {
         })
     }
 
+    /**
+     * Adds a new layer
+     * @param isActive indicates if the new layer should also be set as active layer
+     */
     public addLayer(isActive = false): void {
-        const layer = new Konva.Layer({
-            id: IdHelper.getLayerId()
-        });
-        this.stage.add(layer);
-
-        const selectionHandler = new SelectionHandler(this.stage, layer);
-
-        const layerFacade = new LayerFacade(layer, selectionHandler);
-        layerFacade.onLayerChanged = (shapes) => {
-            selectionHandler?.updateSelectionById(...layerFacade.findSelected().map(shape => shape.id))
-        };
-
-        selectionHandler.onSelect = (selected) => {
-            if (this.onSelect) {
-                console.log(selected)
-                this.onSelect(layerFacade.updateSelection(...selected));
-            }
-        }
-
-        this.layers[layer.id()] = layerFacade;
-
-        if (isActive) {
-            this.switchLayer(layer.id())
-        }
+        this.layerService.addLayer(isActive);
     }
 
-    public switchLayer(id: string) {
-        const layerExists = Object.keys(this.layers).includes(id);
-        if (!layerExists) {
-            throw new Error(`The layer with id ${id} does not exist`);
-        }
-
-        const currentLayer = this.layers[id];
-        if (currentLayer) {
-            currentLayer.deactivate();
-        }
-
-        this.activeLayerId = id;
+    /**
+     * Activates the layer indicated by id
+     * @param id id of the that should be activated
+     */
+    public activateLayer(id: string): void {
+        return this.layerService.activateLayer(id);
     }
 
     /**
@@ -127,25 +102,21 @@ export class DrawingEditor {
      * @returns ids of the layers
      */
     public getLayers(): string[] {
-        return Object.keys(this.layers);
+        return this.layerService.getLayers();
     }
 
     /**
      * Hides shapes on all layers
      */
     public hide(): void {
-        Object.values(this.layers).forEach(layer => {
-            layer.hide();
-        });
+        this.layerService.hide();
     }
 
     /**
      * Shows shapes on all layers
      */
     public show(): void {
-        Object.values(this.layers).forEach(layer => {
-            layer.show();
-        });
+        this.layerService.show();
     }
 
     /**
@@ -153,12 +124,7 @@ export class DrawingEditor {
      * @param id the id of the layer whose shapes should be hidden
      */
     public hideLayer(id?: string): void {
-        if (id) {
-            const layer = this.getLayerById(id);
-            layer.hide();
-        } else {
-            this.getActiveLayer().hide()
-        }
+        this.layerService.hideLayer(id);
     }
 
     /**
@@ -166,10 +132,7 @@ export class DrawingEditor {
      * @param ids ids of the layers whose shapes should be hidden
      */
     public hideLayers(ids: string[]): void {
-        ids.forEach(id => {
-            const layer = this.getLayerById(id);
-            layer.hide();
-        })
+        this.layerService.hideLayers(ids);
     }
 
     /**
@@ -177,12 +140,7 @@ export class DrawingEditor {
      * @param id the id of the layer whose shapes should be shown
      */
     public showLayer(id?: string): void {
-        if (id) {
-            const layer = this.getLayerById(id);
-            layer.show();
-        } else {
-            this.getActiveLayer().show()
-        }
+        this.layerService.showLayer(id);
     }
 
     /**
@@ -190,10 +148,7 @@ export class DrawingEditor {
      * @param ids ids of the layers whose shapes should be shown
      */
     public showLayers(ids: string[]): void {
-        ids.forEach(id => {
-            const layer = this.getLayerById(id);
-            layer.show();
-        })
+        this.layerService.showLayers(ids);
     }
 
     /**
@@ -203,25 +158,7 @@ export class DrawingEditor {
      * @param id the layer to remove
      */
     public removeLayer(id?: string): void {
-        let idToDestroy;
-        if (id) {
-            const layer = this.getLayerById(id);
-            layer.destroy();
-            idToDestroy = id;
-        } else {
-            this.getActiveLayer().destroy();
-            idToDestroy = this.activeLayerId;
-        }
-
-        if (idToDestroy) {
-            delete this.layers[idToDestroy];
-        }
-
-        if (Object.keys(this.layers).length == 0) {
-            this.addLayer(true);
-        } else {
-            this.activeLayerId = Object.keys(this.layers).at(0);
-        }
+        this.layerService.removeLayer(id);
     }
 
     /**
@@ -230,11 +167,13 @@ export class DrawingEditor {
      * @param ids the layers to be removed
      */
     public removeLayers(ids: string[]): void {
-        ids.forEach(id => {
-            this.removeLayer(id);
-        })
+        this.layerService.removeLayers(ids);
     }
 
+    /**
+     * Change the tool that is used
+     * @param type the tool that should be used
+     */
     public changeTool(type: DrawingMode): void {
         const drawer = this.drawers[type];
         console.log(drawer);
@@ -251,7 +190,7 @@ export class DrawingEditor {
     public enableSelection(): void {
         this.isSelectActive = true;
         this.director.dispose();
-        this.getActiveLayer().enableSelection();
+        this.layerService.getActiveLayer().enableSelection();
     }
 
     /**
@@ -259,7 +198,7 @@ export class DrawingEditor {
      */
     public disableSelection(): void {
         this.isSelectActive = false;
-        this.getActiveLayer().disableSelection();
+        this.layerService.getActiveLayer().disableSelection();
     }
 
     /**
@@ -268,7 +207,7 @@ export class DrawingEditor {
     public enableDrag(): void {
         this.isDragActive = true;
         this.director.dispose();
-        this.getActiveLayer().enableDrag();
+        this.layerService.getActiveLayer().enableDrag();
     }
 
     /**
@@ -276,7 +215,7 @@ export class DrawingEditor {
      */
     public disableDrag(): void {
         this.isDragActive = false;
-        this.getActiveLayer().disableDrag();
+        this.layerService.getActiveLayer().disableDrag();
     }
 
     public changeFill(color: string): void {
@@ -288,7 +227,7 @@ export class DrawingEditor {
     }
 
     public deleteSelected() {
-        this.getActiveLayer().deleteSelected();
+        this.layerService.getActiveLayer().deleteSelected();
     }
 
     /**
@@ -297,7 +236,7 @@ export class DrawingEditor {
      * @returns Array of Shapes
      */
     public export(): ShapeData[] {
-        const shapes = this.getActiveLayer().findAll();
+        const shapes = this.layerService.getActiveLayer().findAll();
         return shapes.map((shape) => {
             return shape.toData();
         });
@@ -307,7 +246,7 @@ export class DrawingEditor {
      * Clears all shapes
      */
     public clear(): void {
-        this.getActiveLayer().clear();
+        this.layerService.getActiveLayer().clear();
     }
 
     /**
@@ -373,7 +312,7 @@ export class DrawingEditor {
      * @param ids of the shapes that should be updated
      */
     public updateShapeConfig(config: ShapeConfig, ...ids: string[]): void {
-        const shapes = this.getActiveLayer().findById(ids);
+        const shapes = this.layerService.getActiveLayer().findById(ids);
         if (!shapes) {
             return;
         }
@@ -388,14 +327,14 @@ export class DrawingEditor {
         if (DrawingType.CLICK === drawer.drawingType) {
             director = new ClickDrawingDirector(
                 this.stage,
-                this.getActiveLayer(),
+                this.layerService.getActiveLayer(),
                 drawer as ClickDrawer<Konva.Shape>,
                 this.shapeConfig
             );
         } else if (DrawingType.MOVE === drawer.drawingType) {
             director = new MoveDrawingDirector(
                 this.stage,
-                this.getActiveLayer(),
+                this.layerService.getActiveLayer(),
                 drawer,
                 this.shapeConfig
             );
@@ -412,23 +351,8 @@ export class DrawingEditor {
     }
 
     private addShapes(shapes: ShapeData[]): void {
-        this.getActiveLayer().add(...shapes.map(ShapeFactory.createKonvaShape));
-    }
-
-    private getActiveLayer(): LayerFacade {
-        if (!this.activeLayerId) {
-            throw new Error("There is no active Layer!");
-        }
-
-        return this.layers[this.activeLayerId];
-    }
-
-    private getLayerById(id: string): LayerFacade {
-        const layer = this.layers[id];
-        if (!layer) {
-            throw new Error(`There is no layer with id: ${id}`);
-        }
-
-        return layer;
+        this.layerService
+            .getActiveLayer()
+            .add(...shapes.map(ShapeFactory.createKonvaShape));
     }
 }
