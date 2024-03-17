@@ -13,12 +13,10 @@ import { RectangleDrawer } from './shapes/rectangle/rectangle.drawer';
 import { StateManager } from "./state-manager";
 import { ShapeData, ShapeConfig, ShapeType, Shape } from "./shapes";
 import { ShapeFactory } from "./shape.factory";
-import { LayerFacade } from "./shapes/layer-facade";
 import { logging } from "./logging/logger";
 import { LayerService } from "./layer.service";
 
 export class DrawingEditor {
-    onSelect?: (shapes: Shape[]) => void;
     onLogMessage?: (message: string) => void;
 
     private readonly stage: Konva.Stage;
@@ -67,12 +65,15 @@ export class DrawingEditor {
             width: width,
             height: height
         });
+
+
+        this.layerService = new LayerService(this.stage);
+
         this.addLayer(true);
 
         this.director = this.createDirector(new RectangleDrawer());
         this.stateManager = new StateManager();
 
-        this.layerService = new LayerService(this.stage);
 
         logging.onLogMessage((message) => {
             if (this.onLogMessage) {

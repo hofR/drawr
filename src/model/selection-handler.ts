@@ -1,7 +1,8 @@
 import Konva from 'konva';
 
 /**
- * Stolen from https://konvajs.org/docs/select_and_transform/Basic_demo.html
+ * 
+ * @see https://konvajs.org/docs/select_and_transform/Basic_demo.html
  */
 export class SelectionHandler {
     onSelect?: (ids: string[]) => void;
@@ -38,7 +39,7 @@ export class SelectionHandler {
 
     public dispose(): void {
         if(this.getSelectedIds().length > 0) {
-            this.updateSelection([]);
+            this.clearSelection();
         }
 
         this.layer
@@ -54,29 +55,13 @@ export class SelectionHandler {
         this.stage.removeEventListener('click tap');
     }
 
-    public updateSelection(nodes: Konva.Node[]): string[] {
-        this.transformer.nodes(nodes);
-        const selectedIds = this.getSelectedIds();
-        this.fireOnSelect();
-
-        return selectedIds;
-    }
-
     public clearSelection(): void {
         this.transformer.nodes([]);
     }
 
-    public updateSelectionById(...ids: string[]): string[] {
+    public updateSelectionById(...ids: string[]): void {
         const nodes = this.layer.find((node: Konva.Node) => ids.includes(node.id()));
         this.transformer.nodes(nodes);
-        const selectedIds = this.getSelectedIds();
-        //this.fireOnSelect();
-
-        return selectedIds;
-    }
-
-    public getSelectedIds(): string[] {
-        return this.transformer.nodes().map((node) => node.id());
     }
 
     protected handleMouseDown(mouseEvent: Konva.KonvaEventObject<MouseEvent>): void {
@@ -172,5 +157,9 @@ export class SelectionHandler {
         if (this.onSelect) {
             this.onSelect(this.getSelectedIds());
         }
+    }
+
+    private getSelectedIds(): string[] {
+        return this.transformer.nodes().map((node) => node.id());
     }
 }

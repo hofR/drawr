@@ -15,20 +15,7 @@ export class LayerService {
         });
         this.stage.add(layer);
 
-        const selectionHandler = new SelectionHandler(this.stage, layer);
-
-        const layerFacade = new LayerFacade(layer, selectionHandler);
-        layerFacade.onLayerChanged = (shapes) => {
-            selectionHandler?.updateSelectionById(...layerFacade.findSelected().map(shape => shape.id))
-        };
-
-        selectionHandler.onSelect = (selected) => {
-            if (this.onSelect) {
-                console.log(selected)
-                this.onSelect(layerFacade.updateSelection(...selected));
-            }
-        }
-
+        const layerFacade = new LayerFacade(layer, new SelectionHandler(this.stage, layer));
         this.layers[layer.id()] = layerFacade;
 
         if (isActive) {

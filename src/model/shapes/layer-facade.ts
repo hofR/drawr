@@ -31,23 +31,24 @@ export class LayerFacade {
         private readonly selectionHandler: SelectionHandler
     ) {
         this.logger = logging.createLogger("LayerFacade");
+        selectionHandler.onSelect = (selected) => {
+            this.logger.log("selectionHandler.onSelect: " + selected);
+            this.updateSelection(...selected);
+        }
     }
-
-    onLayerChanged?: (shapes: Shape[]) => void;
 
     add(...shapes: Konva.Shape[]) {
         this.logger.log("Adding shape to stage")
         this.layer.add(...shapes)
         this.shapes.push(...shapes.map(shape => this.createShape(shape)));
-        this.fireOnLayerChanged();
     }
 
-    /**
+    /**updateSelectionById
      * Deletes all shapes that are currently selected
      */
     deleteSelected() {
         const selected = this.findSelected();
-        this.selectionHandler?.updateSelection([]);
+        this.selectionHandler?.updateSelectionById(...selected.map(shape => shape.id));
         this.delete(...selected);
     }
 
@@ -63,14 +64,12 @@ export class LayerFacade {
         shapes.forEach((shape) => shape.delete())
     }
 
-    updateSelection(...ids: string[]): Shape[] {
+    private updateSelection(...ids: string[]): void {
         const selected = this.findById(ids);
         const unselected = this.shapes.filter(shape => !ids.includes(shape.id));
 
         selected.forEach(shape => shape.select());
         unselected.forEach(shape => shape.deselect());
-
-        return this.findSelected();
     }
 
     /**
@@ -139,29 +138,19 @@ export class LayerFacade {
             const index = this.shapes.findIndex(shape => shape.id === toRemove.id)
             this.shapes.splice(index, 1);
         });
-
-        this.fireOnLayerChanged();
     }
 
     private createShape(node: Konva.Node): Shape {
-        //TODO FIX DELETION AND SELECTION UPDATE
         const shape = ShapeFactory.createShape(node);
-        
+
         shape.on('delete', (event) => {
             this.remove(event.detail.shape)
         });
 
         shape.on('selectionChange', (event) => {
             this.selectionHandler.updateSelectionById(...this.findSelected().map(shape => shape.id))
-            //this.fireOnLayerChanged();
         })
 
         return shape;
-    }
-
-    private fireOnLayerChanged(): void {
-        if (this.onLayerChanged) {
-            this.onLayerChanged(this.shapes);
-        }
     }
 }

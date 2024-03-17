@@ -14,13 +14,10 @@ import { Shape } from 'drawr';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-
-
   title = 'drawr-demo';
   editor?: DrawingEditor;
   DrawerType = DrawingMode;
   shapes?: ShapeData[];
-  selected: Shape[] = [];
   layers: string[] = [];
 
   ngOnInit(): void {
@@ -29,11 +26,6 @@ export class AppComponent implements OnInit {
 
   initKonva() {
     this.editor = new DrawingEditor('container', window.innerWidth, window.innerHeight);
-    this.editor.onSelect = (shapes: Shape[]) => {
-      this.selected = shapes;
-      console.log(this.selected)
-    }
-
     this.editor.onLogMessage = (message: string) => {
       console.log(message)
     }
@@ -70,8 +62,6 @@ export class AppComponent implements OnInit {
   }
 
   onDelete() {
-    //this.selected.at(0)?.delete();
-
     this.editor?.deleteSelected();
   }
 
@@ -104,7 +94,7 @@ export class AppComponent implements OnInit {
   onSelectionChange($event: Event) {
     const target = $event.target as HTMLInputElement;
     console.log(target.value)
-    this.editor?.switchLayer(target.value);
+    this.editor?.activateLayer(target.value);
   }
 
   hideLayer(): void {
