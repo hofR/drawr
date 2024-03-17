@@ -14,11 +14,14 @@ import { Shape } from 'drawr';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+
+
   title = 'drawr-demo';
   editor?: DrawingEditor;
   DrawerType = DrawingMode;
   shapes?: ShapeData[];
   selected: Shape[] = [];
+  layers: string[] = [];
 
   ngOnInit(): void {
     this.initKonva()
@@ -26,12 +29,12 @@ export class AppComponent implements OnInit {
 
   initKonva() {
     this.editor = new DrawingEditor('container', window.innerWidth, window.innerHeight);
-    this.editor.onSelect = (shapes) => {
+    this.editor.onSelect = (shapes: Shape[]) => {
       this.selected = shapes;
       console.log(this.selected)
     }
 
-    this.editor.onLogMessage = (message) => {
+    this.editor.onLogMessage = (message: string) => {
       console.log(message)
     }
   }
@@ -92,4 +95,39 @@ export class AppComponent implements OnInit {
   redo() {
     this.editor?.redo();
   }
+
+  addLayer() {
+    this.editor?.addLayer(true)
+    this.layers = this.editor?.getLayers() ?? [];
+  }
+
+  onSelectionChange($event: Event) {
+    const target = $event.target as HTMLInputElement;
+    console.log(target.value)
+    this.editor?.switchLayer(target.value);
+  }
+
+  hideLayer(): void {
+    this.editor?.hideLayer();
+  }
+
+  showLayer(): void {
+    this.editor?.showLayer();
+  }
+
+
+  show(): void {
+    this.editor?.show();
+  }
+
+
+  hide(): void {
+    this.editor?.hide();
+  }
+
+  deleteLayer(): void {
+    this.editor?.removeLayer();
+  }
+
 }
+

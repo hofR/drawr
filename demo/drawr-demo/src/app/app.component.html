@@ -1,35 +1,56 @@
-<button (click)="changeTool(DrawerType.RECTANGLE)">RECTANGLE</button>
-<button (click)="changeTool(DrawerType.LINE)">LINE</button>
-<button (click)="changeTool(DrawerType.POLYGON)">POLYGON</button>
-
-
-<button (click)="enableDrag()">DRAG</button>
-<button (click)="disableDrag()">NO DRAG</button>
-
-<button (click)="enableSelect()">SELECT</button>
-<button (click)="disableSelect()">NO SELECT</button>
-
-<button (click)="onDelete()">DELETE</button>
-<button (click)="onClear()">Clear</button>
-
-
-<button (click)="export()">EXPORT</button>
-<button (click)="import()">IMPORT</button>
-
-<button (click)="undo()">UNDO</button>
-<button (click)="redo()">REDO</button>
-
 <div>
-    <label>Stroke-Color</label>
-    <input type="color"  (change)="onStrokeChanged($event)">
+    <h3>Tool Options</h3>
+    <button (click)="changeTool(DrawerType.RECTANGLE)">RECTANGLE</button>
+    <button (click)="changeTool(DrawerType.LINE)">LINE</button>
+    <button (click)="changeTool(DrawerType.POLYGON)">POLYGON</button>
 </div>
 
 <div>
-    <label>Color</label>
-    <input type="color" (change)="onColorChanged($event)">
+    <h3>Drag Options</h3>
+    <button (click)="enableDrag()">DRAG</button>
+    <button (click)="disableDrag()">NO DRAG</button>
 </div>
 
+<div>
+    <h3>Select Options</h3>
+    <button (click)="enableSelect()">SELECT</button>
+    <button (click)="disableSelect()">NO SELECT</button>
+</div>
+
+<div>
+    <h3>State Options</h3>
+    <button (click)="onDelete()">DELETE</button>
+    <button (click)="onClear()">Clear</button>
+    <button (click)="export()">EXPORT</button>
+    <button (click)="import()">IMPORT</button>
+    <button (click)="undo()">UNDO</button>
+    <button (click)="redo()">REDO</button>
+</div>
+
+<div>
+    <h3>Layer Options</h3>
+    <button (click)="addLayer()">ADD LAYER</button>
+    <button (click)="hideLayer()">HIDE LAYER</button>
+    <button (click)="showLayer()">SHOW LAYER</button>
+    <button (click)="show()">SHOW ALL</button>
+    <button (click)="hide()">Hide ALL</button>
+    <button (click)="deleteLayer()">Delete Layer</button>
+    <select (change)="onSelectionChange($event)">
+        <option *ngFor="let layer of layers" [value]="layer">{{layer}}</option>
+    </select>
+</div>
+
+<div>
+    <h3>Shape Options</h3>
+    <div>
+        <label>Stroke-Color</label>
+        <input type="color" (change)="onStrokeChanged($event)">
+    </div>
+    <div>
+        <label>Color</label>
+        <input type="color" (change)="onColorChanged($event)">
+    </div>
+</div>
 
 <div id="container"></div>
-
 <router-outlet></router-outlet>

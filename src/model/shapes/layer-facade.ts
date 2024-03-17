@@ -113,6 +113,24 @@ export class LayerFacade {
             .filter(shape => shape.selected);
     }
 
+    deactivate(): void {
+        this.disableSelection();
+    }
+
+    hide(): void {
+        this.layer.hide();
+    }
+
+    show(): void {
+        this.layer.show();
+    }
+
+    destroy(): void {
+        this.clear();
+        this.deactivate();
+        this.layer.destroy();
+    }
+
     private remove(...shapes: Shape[]): void {
         shapes.forEach((toRemove) => {
             const index = this.shapes.findIndex(shape => shape.id === toRemove.id)
