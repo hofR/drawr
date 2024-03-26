@@ -37,6 +37,10 @@ export class LayerFacade {
         }
     }
 
+    get id(): string {
+        return this.layer.id();
+    }
+
     add(...shapes: Konva.Shape[]) {
         this.logger.log("Adding shape to stage")
         this.layer.add(...shapes)
