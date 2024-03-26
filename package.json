@@ -1,5 +1,5 @@
 {
-  "name": "drawr",
+  "name": "@hofR/drawr",
   "version": "0.0.1",
   "description": "",
   "main": "./dist/index.js",
@@ -23,5 +23,12 @@
   },
   "dependencies": {
     "konva": "^9.3.0"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hofR/drawr"
   }
 }
