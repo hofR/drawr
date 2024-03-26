@@ -1,6 +1,6 @@
 import Konva from "konva";
 import { DrawingType } from './drawing-type';
-import { DrawingMode } from './drawing-mode';
+import { Tool as Tool } from './drawing-mode';
 
 import { ClickDrawingDirector } from './directors/click-drawing-director';
 import { DrawingDirector } from './directors/drawing-director';
@@ -22,7 +22,7 @@ export class DrawingEditor {
     private readonly stage: Konva.Stage;
     private readonly stateManager: StateManager;
 
-    private director: DrawingDirector;
+    private director?: DrawingDirector;
 
     private isSelectActive = false;
     private isDragActive = false;
@@ -55,6 +55,12 @@ export class DrawingEditor {
         return this.isSelectActive;
     }
 
+    get activeTool(): Tool | undefined {
+        return this.tool;
+    }
+
+    private tool?: Tool;
+
     constructor(
         selector: string,
         width: number,
@@ -70,10 +76,7 @@ export class DrawingEditor {
         this.layerService = new LayerService(this.stage);
 
         this.addLayer(true);
-
-        this.director = this.createDirector(new RectangleDrawer());
         this.stateManager = new StateManager();
-
 
         logging.onLogMessage((message) => {
             if (this.onLogMessage) {
@@ -175,11 +178,12 @@ export class DrawingEditor {
      * Change the tool that is used
      * @param type the tool that should be used
      */
-    public changeTool(type: DrawingMode): void {
-        const drawer = this.drawers[type];
+    public changeTool(type: Tool): void {
+        this.tool = type;
+        const drawer = this.drawerMap[type];
         console.log(drawer);
 
-        this.director.dispose();
+        this.director?.dispose();
         this.disableSelection();
         this.disableDrag();
         this.director = this.createDirector(drawer);
@@ -190,7 +194,8 @@ export class DrawingEditor {
      */
     public enableSelection(): void {
         this.isSelectActive = true;
-        this.director.dispose();
+        this.director?.dispose();
+        this.tool = undefined;
         this.layerService.getActiveLayer().enableSelection();
     }
 
@@ -207,7 +212,8 @@ export class DrawingEditor {
      */
     public enableDrag(): void {
         this.isDragActive = true;
-        this.director.dispose();
+        this.director?.dispose();
+        this.tool = undefined;
         this.layerService.getActiveLayer().enableDrag();
     }
 

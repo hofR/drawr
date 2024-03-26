@@ -1,6 +1,5 @@
-
-export enum DrawingMode {
-  RECTANGLE,
-  POLYGON,
-  LINE
+export enum Tool {
+  RECTANGLE = "RECTANGLE",
+  POLYGON = "POLYGON",
+  LINE = "LINE"
 }
