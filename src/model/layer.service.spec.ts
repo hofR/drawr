@@ -1,12 +1,16 @@
 import Konva from "konva";
-import { DrawingEditor } from "./drawing-editor";
 import { LayerService } from "./layer.service";
+
+let service: LayerService;
+let stage: Konva.Stage;
+
+beforeEach(() => {
+    stage = createStage();
+    service = new LayerService(stage);
+})
 
 describe("init tests", () => {
     it("creates default active layer", () => {
-        const stage = createStage();
-        const service = new LayerService(stage);
-
         const layers = service.getLayers();
         expect(layers).toBeDefined();
         expect(layers.length).toBe(1);
@@ -17,8 +21,6 @@ describe("init tests", () => {
 
 describe("addLayer", () => {
     it("adds additional layer", () => {
-        const stage = createStage();
-        const service = new LayerService(stage);
         service.addLayer();
 
         const layers = service.getLayers();
@@ -26,8 +28,6 @@ describe("addLayer", () => {
     })
 
     it("activates new layer", () => {
-        const stage = createStage();
-        const service = new LayerService(stage);
         const layers = service.getLayers();
 
         service.addLayer(true);
@@ -38,8 +38,6 @@ describe("addLayer", () => {
     })
 
     it("adds a new layer each time", () => {
-        const stage = createStage();
-        const service = new LayerService(stage);
         service.addLayer();
         service.addLayer();
         service.addLayer();
@@ -52,8 +50,6 @@ describe("addLayer", () => {
 
 describe("removal", () => {
     it("with id works", () => {
-        const stage = createStage();
-        const service = new LayerService(stage);
         service.addLayer();
         service.addLayer();
 
@@ -66,8 +62,6 @@ describe("removal", () => {
     })
 
     it("without id removes active layer", () => {
-        const stage = createStage();
-        const service = new LayerService(stage);
         service.addLayer();
 
         const layers = service.getLayers();
@@ -81,9 +75,6 @@ describe("removal", () => {
     })
 
     it("prevents inactive layer", () => {
-        const stage = createStage();
-        const service = new LayerService(stage);
-
         const layers = service.getLayers();
         expect(layers.length).toBe(1);
         expect(service.getActiveLayer()).toBeDefined();
@@ -97,8 +88,6 @@ describe("removal", () => {
 
 describe("activateLayer", () => {
     it("changes active layer", () => {
-        const stage = createStage();
-        const service = new LayerService(stage);
         service.addLayer(true);
         service.addLayer();
 
@@ -110,8 +99,6 @@ describe("activateLayer", () => {
     })
 
     it("throws error for unknown id", () => {
-        const stage = createStage();
-        const service = new LayerService(stage);
         service.addLayer(true);
 
         expect(() => { service.activateLayer("unknown") }).toThrow();
