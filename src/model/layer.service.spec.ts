@@ -3,45 +3,71 @@ import { DrawingEditor } from "./drawing-editor";
 import { LayerService } from "./layer.service";
 
 describe("init tests", () => {
-    it("addLayer works", () => {
+    it("creates default active layer", () => {
         const stage = createStage();
         const service = new LayerService(stage);
+
+        const layers = service.getLayers();
+        expect(layers).toBeDefined();
+        expect(layers.length).toBe(1);
+
+        expect(service.getActiveLayer()).toBeDefined();
+    })
+})
+
+describe("addLayer", () => {
+    it("adds additional layer", () => {
+        const stage = createStage();
+        const service = new LayerService(stage);
+        service.addLayer();
+
+        const layers = service.getLayers();
+        expect(layers.length).toEqual(2);
+    })
+
+    it("activates new layer", () => {
+        const stage = createStage();
+        const service = new LayerService(stage);
+        const layers = service.getLayers();
+
         service.addLayer(true);
 
         const layer = service.getActiveLayer();
         expect(layer).toBeDefined();
+        expect(layer.id).not.toBe(layers.at(0))
     })
 
-    it("creation works", () => {
+    it("adds a new layer each time", () => {
         const stage = createStage();
         const service = new LayerService(stage);
-        service.addLayer(true);
+        service.addLayer();
         service.addLayer();
         service.addLayer();
 
         const layers = service.getLayers();
         expect(layers).toBeDefined();
-        expect(layers.length).toBe(3);
+        expect(layers.length).toBe(4);
     })
+})
 
-    it("removal by id works", () => {
+describe("removal", () => {
+    it("with id works", () => {
         const stage = createStage();
         const service = new LayerService(stage);
-        service.addLayer(true);
+        service.addLayer();
         service.addLayer();
 
         const layers = service.getLayers();
-        expect(layers.length).toBe(2);
+        expect(layers.length).toBe(3);
 
         service.removeLayer(layers.at(1));
         const layersAfterDelete = service.getLayers();
-        expect(layersAfterDelete.length).toBe(1);
+        expect(layersAfterDelete.length).toBe(2);
     })
 
-    it("removeLayer without id removes active layer", () => {
+    it("without id removes active layer", () => {
         const stage = createStage();
         const service = new LayerService(stage);
-        service.addLayer(true);
         service.addLayer();
 
         const layers = service.getLayers();
@@ -54,10 +80,9 @@ describe("init tests", () => {
         expect(layersAfterDelete.at(0)).toBe(remainingLayer);
     })
 
-    it("removeLayer prevents inactive layer", () => {
+    it("prevents inactive layer", () => {
         const stage = createStage();
         const service = new LayerService(stage);
-        service.addLayer(true);
 
         const layers = service.getLayers();
         expect(layers.length).toBe(1);

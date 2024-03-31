@@ -7,7 +7,9 @@ export class LayerService {
     private readonly layers: Record<string, LayerFacade> = {};
     private activeLayerId?: string;
 
-    constructor(private readonly stage: Konva.Stage) { }
+    constructor(private readonly stage: Konva.Stage) { 
+        this.addLayer(true);
+    }
 
     public addLayer(isActive = false): void {
         const layer = new Konva.Layer({

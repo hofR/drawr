@@ -74,8 +74,6 @@ export class DrawingEditor {
 
 
         this.layerService = new LayerService(this.stage);
-
-        this.addLayer(true);
         this.stateManager = new StateManager();
 
         logging.onLogMessage((message) => {
