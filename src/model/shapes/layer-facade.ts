@@ -47,7 +47,7 @@ export class LayerFacade {
         this.shapes.push(...shapes.map(shape => this.createShape(shape)));
     }
 
-    /**updateSelectionById
+    /**
      * Deletes all shapes that are currently selected
      */
     deleteSelected() {
