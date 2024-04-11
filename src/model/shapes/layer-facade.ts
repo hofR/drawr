@@ -52,7 +52,7 @@ export class LayerFacade {
    */
   deleteSelected() {
     const selected = this.findSelected();
-    this.selectionHandler?.updateSelectionById(...selected.map((shape) => shape.id));
+    //this.selectionHandler?.updateSelectionById(...selected.map((shape) => shape.id));
     this.delete(...selected);
   }
 
@@ -106,6 +106,10 @@ export class LayerFacade {
 
   findAll(): Shape[] {
     return this.shapes;
+  }
+
+  findSingleById(id: string): Shape | undefined {
+    return this.shapes.find((shape) => shape.id === id);
   }
 
   findById(ids: string[]): Shape[] {

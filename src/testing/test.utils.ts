@@ -10,6 +10,14 @@ export function createStage(): Konva.Stage {
   });
 }
 
+export function createKonvaRects(count: number): Konva.Shape[] {
+  const rects: Konva.Shape[] = [];
+  for (let index = 0; index < count; index++) {
+    rects.push(createKonvaRect(`rect-${index}`));
+  }
+  return rects;
+}
+
 export function createKonvaRect(id?: string): Konva.Rect {
   const type: ShapeType = 'RECTANGLE';
   return new Konva.Rect({

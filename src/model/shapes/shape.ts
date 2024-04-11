@@ -150,6 +150,6 @@ export abstract class Shape<KonvaShape extends Konva.Shape = Konva.Shape, Data e
   };
 
   private getEvent(type: keyof ShapeEventMap): CustomEvent {
-    return new CustomEvent(type, { detail: { shape: this.shape } });
+    return new CustomEvent(type, { detail: { shape: this } });
   }
 }
