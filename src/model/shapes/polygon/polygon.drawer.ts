@@ -13,9 +13,9 @@ export class PolygonDrawer extends ClickDrawer<Konva.Line> {
     });
   }
 
-  resize(rect: Konva.Line, x: number, y: number): void {
-    const newPoints = rect.points().concat(x, y);
-    rect.points(newPoints);
+  resize(line: Konva.Line, x: number, y: number): void {
+    const newPoints = line.points().concat(x, y);
+    line.points(newPoints);
   }
 
   finalize(line: Konva.Line): void {

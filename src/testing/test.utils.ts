@@ -1,5 +1,5 @@
 import Konva from 'konva';
-import { ShapeType } from '../model/shapes';
+import { ShapeConfig, ShapeType } from '../model/shapes';
 import { DrawrLog, DrawrLogLevel, logging } from '../model/logging/logger';
 
 export function createStage(): Konva.Stage {
@@ -33,4 +33,23 @@ export function configureLogging(level: DrawrLogLevel): void {
   logManager.onLog((log: DrawrLog) => {
     console.log(`${log.level} [${log.name}]: ${log.message}`);
   });
+}
+
+export function expectShapeAfterCreate(shape: Konva.Shape, type: ShapeType, x: number, y: number, config: ShapeConfig): void {
+  expect(shape.name()).toBe(type);
+  expect(shape.fill()).toBe(config.fill);
+  expect(shape.stroke()).toBe(config.stroke);
+  expect(shape.strokeWidth()).toBe(config.strokeWidth);
+}
+
+export function getCreateParams(): [number, number, ShapeConfig] {
+  const x = 10;
+  const y = 10;
+  const config: ShapeConfig = {
+    fill: 'test',
+    stroke: 'test',
+    strokeWidth: 100,
+  };
+
+  return [x, y, config];
 }

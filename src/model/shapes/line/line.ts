@@ -11,7 +11,7 @@ export class Line extends Shape<Konva.Line, LineData> {
     return this.shape.points();
   }
 
-  protected override mapToData(): LineData {
+  override mapToData(): LineData {
     return {
       points: this.points,
       ...this.shapeData,
