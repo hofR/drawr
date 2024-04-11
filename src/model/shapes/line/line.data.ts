@@ -1,6 +1,5 @@
-import { ShapeData } from "../shape.data";
-
+import { ShapeData } from '../shape.data';
 
 export interface LineData extends ShapeData {
-    points: number[];
+  points: number[];
 }

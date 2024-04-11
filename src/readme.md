@@ -10,7 +10,7 @@
 - Multi Layer support
 - Cut & Copy & Paste
 - Public methods for retrieving shape information
-    - e.g. all shapes on layer
+  - e.g. all shapes on layer
 - Toggle visibility of shapes
 - handling of scale and rotate
 

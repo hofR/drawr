@@ -11,7 +11,7 @@ import { Shape } from 'drawr';
   standalone: true,
   imports: [CommonModule, RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
   title = 'drawr-demo';
@@ -21,14 +21,14 @@ export class AppComponent implements OnInit {
   layers: string[] = [];
 
   ngOnInit(): void {
-    this.initKonva()
+    this.initKonva();
   }
 
   initKonva() {
     this.editor = new DrawingEditor('container', window.innerWidth, window.innerHeight);
     this.editor.onLogMessage = (message: string) => {
-      console.log(message)
-    }
+      console.log(message);
+    };
   }
 
   changeTool(type: DrawingMode) {
@@ -66,7 +66,7 @@ export class AppComponent implements OnInit {
   }
 
   onClear() {
-    this.editor?.clear()
+    this.editor?.clear();
   }
 
   export() {
@@ -74,7 +74,7 @@ export class AppComponent implements OnInit {
   }
 
   import() {
-    console.log(this.shapes)
+    console.log(this.shapes);
     this.editor?.import(this.shapes ?? []);
   }
 
@@ -87,13 +87,13 @@ export class AppComponent implements OnInit {
   }
 
   addLayer() {
-    this.editor?.addLayer(true)
+    this.editor?.addLayer(true);
     this.layers = this.editor?.getLayers() ?? [];
   }
 
   onSelectionChange($event: Event) {
     const target = $event.target as HTMLInputElement;
-    console.log(target.value)
+    console.log(target.value);
     this.editor?.activateLayer(target.value);
   }
 
@@ -105,11 +105,9 @@ export class AppComponent implements OnInit {
     this.editor?.showLayer();
   }
 
-
   show(): void {
     this.editor?.show();
   }
-
 
   hide(): void {
     this.editor?.hide();
@@ -118,6 +116,4 @@ export class AppComponent implements OnInit {
   deleteLayer(): void {
     this.editor?.removeLayer();
   }
-
 }
-

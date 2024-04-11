@@ -1,99 +1,97 @@
-import { ShapeData } from "./shapes/shape.data";
+import { ShapeData } from './shapes/shape.data';
 
 export class StateManager {
-    private currentState: ShapeData[] = [];
-    private stateStack: ShapeData[][] = [];
-    private redoStack: ShapeData[][] = [];
-    private readonly maxCount = 100;
+  private currentState: ShapeData[] = [];
+  private stateStack: ShapeData[][] = [];
+  private redoStack: ShapeData[][] = [];
+  private readonly maxCount = 100;
 
-    constructor() { }
+  constructor() {}
 
-    /**
-     * Save an array of shapes as new state
-     * 
-     * - Drops the oldest state if limit is reached
-     * - Resets the redo stack
-     * 
-     * @param state Array of shapes that represent the state
-     */
-    save(state: ShapeData[]): void {
-        if (this.stateStack.length === this.maxCount) {
-            //Drop the oldest element
-            this.stateStack.shift();
-        }
-
-        //Add the current state
-        this.stateStack.push(
-            this.currentState
-        );
-
-        //Make the state of the canvas the current state
-        this.currentState = state;
-
-        //Reset the redo stack.
-        //We can only redo things that were just undone.
-        this.redoStack.length = 0;
+  /**
+   * Save an array of shapes as new state
+   *
+   * - Drops the oldest state if limit is reached
+   * - Resets the redo stack
+   *
+   * @param state Array of shapes that represent the state
+   */
+  save(state: ShapeData[]): void {
+    if (this.stateStack.length === this.maxCount) {
+      //Drop the oldest element
+      this.stateStack.shift();
     }
 
-    /**
-     * Restores the previous state
-     * 
-     * @returns the previous state or undefined if no state is stored 
-     */
-    undo(): ShapeData[] | undefined {
-        if (!this.canUndo()) {
-            return;
-        }
+    //Add the current state
+    this.stateStack.push(this.currentState);
 
-        const newState = this.stateStack.pop();
-        if (!newState) {
-            return;
-        }
+    //Make the state of the canvas the current state
+    this.currentState = state;
 
-        return this.applyState(this.redoStack, newState);
+    //Reset the redo stack.
+    //We can only redo things that were just undone.
+    this.redoStack.length = 0;
+  }
+
+  /**
+   * Restores the previous state
+   *
+   * @returns the previous state or undefined if no state is stored
+   */
+  undo(): ShapeData[] | undefined {
+    if (!this.canUndo()) {
+      return;
     }
 
-    /**
-     * 
-     * @returns true if an action can be undone
-     */
-    canUndo(): boolean {
-        return this.stateStack.length > 0;
+    const newState = this.stateStack.pop();
+    if (!newState) {
+      return;
     }
 
-    /**
-     * Reverses an undo action
-     * 
-     * @returns the new state or undefined if there is nothing to redo
-     */
-    redo(): ShapeData[] | undefined {
-        if (!this.canRedo()) {
-            return;
-        }
+    return this.applyState(this.redoStack, newState);
+  }
 
-        const newState = this.redoStack.pop();
-        if (!newState) {
-            return;
-        }
+  /**
+   *
+   * @returns true if an action can be undone
+   */
+  canUndo(): boolean {
+    return this.stateStack.length > 0;
+  }
 
-        return this.applyState(this.stateStack, newState);
+  /**
+   * Reverses an undo action
+   *
+   * @returns the new state or undefined if there is nothing to redo
+   */
+  redo(): ShapeData[] | undefined {
+    if (!this.canRedo()) {
+      return;
     }
 
-    /**
-     * 
-     * @returns true if an action can be redone
-     */
-    canRedo(): boolean {
-        return this.redoStack.length > 0;
+    const newState = this.redoStack.pop();
+    if (!newState) {
+      return;
     }
 
-    private applyState(stack: ShapeData[][], newState: ShapeData[]): ShapeData[] {
-        //Push the current state
-        stack.push(this.currentState);
+    return this.applyState(this.stateStack, newState);
+  }
 
-        //Make the new state the current state
-        this.currentState = newState;
+  /**
+   *
+   * @returns true if an action can be redone
+   */
+  canRedo(): boolean {
+    return this.redoStack.length > 0;
+  }
 
-        return this.currentState;
-    }
+  private applyState(stack: ShapeData[][], newState: ShapeData[]): ShapeData[] {
+    //Push the current state
+    stack.push(this.currentState);
+
+    //Make the new state the current state
+    this.currentState = newState;
+
+    return this.currentState;
+  }
 }

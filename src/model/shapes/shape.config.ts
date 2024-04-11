@@ -1,5 +1,5 @@
 export interface ShapeConfig {
-    fill?: string;
-    stroke?: string;
-    strokeWidth?: number;
+  fill?: string;
+  stroke?: string;
+  strokeWidth?: number;
 }

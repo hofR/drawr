@@ -1,5 +1,5 @@
 export enum Tool {
-  RECTANGLE = "RECTANGLE",
-  POLYGON = "POLYGON",
-  LINE = "LINE"
+  RECTANGLE = 'RECTANGLE',
+  POLYGON = 'POLYGON',
+  LINE = 'LINE',
 }

@@ -1,22 +1,14 @@
-import Konva from "konva";
+import Konva from 'konva';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { ClickDrawer } from '../drawers/click-drawer';
 import { DrawingDirector } from './drawing-director';
-import { ShapeConfig } from "../shapes";
-import { LayerFacade } from "../shapes/layer-facade";
+import { ShapeConfig } from '../shapes';
+import { LayerFacade } from '../shapes/layer-facade';
 
-
-export class ClickDrawingDirector<KonvaShape extends Konva.Shape>
-  extends DrawingDirector<KonvaShape, ClickDrawer<KonvaShape>> {
-
+export class ClickDrawingDirector<KonvaShape extends Konva.Shape> extends DrawingDirector<KonvaShape, ClickDrawer<KonvaShape>> {
   private initalMouseDownHandled = false;
 
-  constructor(
-    stage: Konva.Stage,
-    layer: LayerFacade,
-    drawer: ClickDrawer<KonvaShape>,
-    shapeConfig: ShapeConfig
-  ) {
+  constructor(stage: Konva.Stage, layer: LayerFacade, drawer: ClickDrawer<KonvaShape>, shapeConfig: ShapeConfig) {
     super(stage, layer, drawer, shapeConfig);
   }
 
@@ -25,8 +17,7 @@ export class ClickDrawingDirector<KonvaShape extends Konva.Shape>
       super.handleMouseDown(mouseEvent);
       this.initalMouseDownHandled = true;
     } else {
-      if (!this.drawer || !this.newAnnotation)
-        return;
+      if (!this.drawer || !this.newAnnotation) return;
 
       const x = mouseEvent.evt.clientX;
       const y = mouseEvent.evt.clientY;
@@ -47,8 +38,7 @@ export class ClickDrawingDirector<KonvaShape extends Konva.Shape>
         this.initalMouseDownHandled = false;
         this.drawer.finalize(this.newAnnotation!);
         this.finish();
-      }
-      else {
+      } else {
         return;
       }
       e.preventDefault();

@@ -1,34 +1,24 @@
-import Konva from "konva";
+import Konva from 'konva';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { DrawingDirector } from './drawing-director';
-import { ShapeConfig } from "../shapes";
-import { MoveDrawer } from "../drawers/move-drawer";
-import { LayerFacade } from "../shapes/layer-facade";
+import { ShapeConfig } from '../shapes';
+import { MoveDrawer } from '../drawers/move-drawer';
+import { LayerFacade } from '../shapes/layer-facade';
 
-
-export class MoveDrawingDirector<KonvaShape extends Konva.Shape> 
-extends DrawingDirector<KonvaShape, MoveDrawer<KonvaShape>> {
-
-  constructor(
-    stage: Konva.Stage,
-    layer: LayerFacade,
-    drawer: MoveDrawer<KonvaShape>,
-    shapeConfig: ShapeConfig
-  ) {
+export class MoveDrawingDirector<KonvaShape extends Konva.Shape> extends DrawingDirector<KonvaShape, MoveDrawer<KonvaShape>> {
+  constructor(stage: Konva.Stage, layer: LayerFacade, drawer: MoveDrawer<KonvaShape>, shapeConfig: ShapeConfig) {
     super(stage, layer, drawer, shapeConfig);
   }
 
   handleMouseUp(mouseEvent: KonvaEventObject<MouseEvent>) {
-      super.finish();
+    super.finish();
   }
 
   handleMouseMove(mouseEvent: KonvaEventObject<MouseEvent>) {
-    if (!this.isDraw || !this.newAnnotation)
-      return;
+    if (!this.isDraw || !this.newAnnotation) return;
 
     const currentPointerPosition = mouseEvent.target.getStage()?.getPointerPosition();
-    if (!currentPointerPosition)
-      return;
+    if (!currentPointerPosition) return;
 
     this.drawer.resize(this.newAnnotation, currentPointerPosition?.x, currentPointerPosition?.y);
   }
