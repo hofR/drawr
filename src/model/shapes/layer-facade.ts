@@ -1,29 +1,15 @@
 import Konva from 'konva';
 import { Shape } from './shape';
 import { ShapeFactory } from '../shape.factory';
-import { Logger, logging } from '../logging/logger';
+import { logging } from '../logging/logger';
 import { SelectionHandler } from '../selection-handler';
-
-export class ShapeCollection {
-  private readonly shapes: Shape[] = [];
-
-  add(...shapes: Shape[]): void {
-    this.shapes.push(...shapes);
-  }
-
-  remove(...shapes: Shape[]): void {
-    shapes.forEach((toRemove) => {
-      const index = this.shapes.findIndex((shape) => shape.id === toRemove.id);
-      this.shapes.splice(index, 1);
-    });
-  }
-}
+import { ShapeCollection } from './shape.collection';
 
 /**
  * Facade to encapsulate access to Konva.Layer
  */
 export class LayerFacade {
-  private readonly shapes: Shape[] = [];
+  private readonly shapes = new ShapeCollection();
   private readonly logger = logging.createLogger('LayerFacade');
 
   constructor(
@@ -43,7 +29,7 @@ export class LayerFacade {
   add(...shapes: Konva.Shape[]) {
     this.logger.debug(`add ${shapes.map((s) => s.id())}`);
     this.layer.add(...shapes);
-    this.shapes.push(...shapes.map((shape) => this.createShape(shape)));
+    this.shapes.add(...shapes.map((shape) => this.createShape(shape)));
   }
 
   /**
@@ -59,7 +45,7 @@ export class LayerFacade {
    * Deletes all shapes on the layer and resets active selections
    */
   clear(): void {
-    this.delete(...this.shapes);
+    this.delete(...this.shapes.get());
     this.selectionHandler.clearSelection();
   }
 
@@ -109,7 +95,7 @@ export class LayerFacade {
 
   findAll(): Shape[] {
     this.logger.debug('findAll');
-    return this.shapes;
+    return this.shapes.get();
   }
 
   findSingleById(id: string): Shape | undefined {
@@ -150,10 +136,7 @@ export class LayerFacade {
   }
 
   private remove(...shapes: Shape[]): void {
-    shapes.forEach((toRemove) => {
-      const index = this.shapes.findIndex((shape) => shape.id === toRemove.id);
-      this.shapes.splice(index, 1);
-    });
+    this.shapes.remove(...shapes);
   }
 
   private createShape(node: Konva.Node): Shape {
