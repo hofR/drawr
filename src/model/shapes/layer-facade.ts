@@ -24,15 +24,14 @@ export class ShapeCollection {
  */
 export class LayerFacade {
   private readonly shapes: Shape[] = [];
-  private readonly logger: Logger;
+  private readonly logger = logging.createLogger('LayerFacade');
 
   constructor(
     private readonly layer: Konva.Layer,
     private readonly selectionHandler: SelectionHandler,
   ) {
-    this.logger = logging.createLogger('LayerFacade');
     selectionHandler.onSelect = (selected) => {
-      this.logger.log('selectionHandler.onSelect: ' + selected);
+      this.logger.debug('selectionHandler.onSelect: ' + selected);
       this.updateSelection(...selected);
     };
   }
@@ -42,7 +41,7 @@ export class LayerFacade {
   }
 
   add(...shapes: Konva.Shape[]) {
-    this.logger.log('Adding shape to stage');
+    this.logger.debug(`add ${shapes.map((s) => s.id())}`);
     this.layer.add(...shapes);
     this.shapes.push(...shapes.map((shape) => this.createShape(shape)));
   }
@@ -80,6 +79,7 @@ export class LayerFacade {
    * Enables drag for all shapes on the layer
    */
   enableDrag(): void {
+    this.logger.debug('enableDrag');
     this.shapes.forEach((shape) => (shape.draggable = true));
   }
 
@@ -87,6 +87,7 @@ export class LayerFacade {
    * Disables drag for all shapes on the layer
    */
   disableDrag(): void {
+    this.logger.debug('disableDrag');
     this.shapes.forEach((shape) => (shape.draggable = false));
   }
 
@@ -94,6 +95,7 @@ export class LayerFacade {
    * Enables selection of shapes on the layer
    */
   enableSelection() {
+    this.logger.debug('enableSelection');
     this.selectionHandler?.setup();
   }
 
@@ -101,38 +103,47 @@ export class LayerFacade {
    * Disables selection of shapes on the layer
    */
   disableSelection() {
+    this.logger.debug('disableSelection');
     this.selectionHandler?.dispose();
   }
 
   findAll(): Shape[] {
+    this.logger.debug('findAll');
     return this.shapes;
   }
 
   findSingleById(id: string): Shape | undefined {
+    this.logger.debug('findSingleById');
     return this.shapes.find((shape) => shape.id === id);
   }
 
   findById(ids: string[]): Shape[] {
+    this.logger.debug('findById');
     return this.shapes.filter((shape) => ids.includes(shape.id)) ?? [];
   }
 
   findSelected(): Shape[] {
+    this.logger.debug('findSelected');
     return this.shapes.filter((shape) => shape.selected);
   }
 
   deactivate(): void {
+    this.logger.debug('deactivate');
     this.disableSelection();
   }
 
   hide(): void {
+    this.logger.debug('hide');
     this.layer.hide();
   }
 
   show(): void {
+    this.logger.debug('show');
     this.layer.show();
   }
 
   destroy(): void {
+    this.logger.debug('destroy');
     this.clear();
     this.deactivate();
     this.layer.destroy();
@@ -149,10 +160,12 @@ export class LayerFacade {
     const shape = ShapeFactory.createShape(node);
 
     shape.on('delete', (event) => {
+      this.logger.debug('shape.onDelete: ' + event.detail.shape.id);
       this.remove(event.detail.shape);
     });
 
     shape.on('selectionChange', (event) => {
+      this.logger.debug('shape.onSelectionChange');
       this.selectionHandler.updateSelectionById(...this.findSelected().map((shape) => shape.id));
     });
 

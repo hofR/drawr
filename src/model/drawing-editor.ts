@@ -13,14 +13,15 @@ import { RectangleDrawer } from './shapes/rectangle/rectangle.drawer';
 import { StateManager } from './state-manager';
 import { ShapeData, ShapeConfig, ShapeType, Shape } from './shapes';
 import { ShapeFactory } from './shape.factory';
-import { logging } from './logging/logger';
+import { DrawrLog, logging } from './logging/logger';
 import { LayerService } from './layer.service';
 
 export class DrawingEditor {
-  onLogMessage?: (message: string) => void;
+  onLog?: (log: DrawrLog) => void;
 
   private readonly stage: Konva.Stage;
   private readonly stateManager: StateManager;
+  private readonly logger = logging.createLogger('DrawingEditor');
 
   private director?: DrawingDirector;
 
@@ -67,9 +68,9 @@ export class DrawingEditor {
     this.layerService = new LayerService(this.stage);
     this.stateManager = new StateManager();
 
-    logging.onLogMessage((message) => {
-      if (this.onLogMessage) {
-        this.onLogMessage(message);
+    logging.onLog((message) => {
+      if (this.onLog) {
+        this.onLog(message);
       }
     });
   }
@@ -168,9 +169,9 @@ export class DrawingEditor {
    * @param type the tool that should be used
    */
   public changeTool(type: Tool): void {
+    this.logger.debug('changeTool: ' + type);
     this.tool = type;
     const drawer = this.drawerMap[type];
-    console.log(drawer);
 
     this.director?.dispose();
     this.disableSelection();

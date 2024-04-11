@@ -1,5 +1,6 @@
 import Konva from 'konva';
 import { ShapeType } from '../model/shapes';
+import { DrawrLog, DrawrLogLevel, logging } from '../model/logging/logger';
 
 export function createStage(): Konva.Stage {
   document.body.innerHTML = '<div id="container"></div>';
@@ -23,5 +24,13 @@ export function createKonvaRect(id?: string): Konva.Rect {
   return new Konva.Rect({
     id: id,
     name: type,
+  });
+}
+
+export function configureLogging(level: DrawrLogLevel): void {
+  const logManager = logging;
+  logManager.configureLogging(level);
+  logManager.onLog((log: DrawrLog) => {
+    console.log(`${log.level} [${log.name}]: ${log.message}`);
   });
 }

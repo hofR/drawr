@@ -118,7 +118,7 @@ export abstract class Shape<KonvaShape extends Konva.Shape = Konva.Shape, Data e
   }
 
   delete(): void {
-    this.logger.log(`Destroying shape: ${this.id}`);
+    this.logger.debug(`Destroying shape: ${this.id}`);
     this.shape.destroy();
     this.deselect();
     this.dispatchEvent(this.getEvent('delete'));
