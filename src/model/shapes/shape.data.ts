@@ -1,5 +1,5 @@
-import { ShapeType } from './shape.type';
 import { ShapeConfig } from './shape.config';
+import { ShapeType } from './shape.type';
 
 export interface ShapeData extends ShapeConfig {
   type: ShapeType;

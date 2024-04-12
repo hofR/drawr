@@ -1,8 +1,8 @@
 import Konva from 'konva';
-import { Shape } from './shape';
-import { ShapeFactory } from '../shape.factory';
 import { logging } from '../logging/logger';
 import { SelectionHandler } from '../selection-handler';
+import { ShapeFactory } from '../shape.factory';
+import { Shape } from './shape';
 import { ShapeCollection } from './shape.collection';
 
 /**

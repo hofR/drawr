@@ -1,20 +1,20 @@
 import Konva from 'konva';
+import { Tool } from './drawing-mode';
 import { DrawingType } from './drawing-type';
-import { Tool as Tool } from './drawing-mode';
 
 import { ClickDrawingDirector } from './directors/click-drawing-director';
 import { DrawingDirector } from './directors/drawing-director';
 import { MoveDrawingDirector } from './directors/move-drawing-director';
 import { ClickDrawer } from './drawers/click-drawer';
 import { Drawer } from './drawers/drawer';
-import { PolygonDrawer } from './shapes/polygon/polygon.drawer';
+import { LayerService } from './layer.service';
+import { DrawrLog, logging } from './logging/logger';
+import { ShapeFactory } from './shape.factory';
+import { Shape, ShapeConfig, ShapeData, ShapeType } from './shapes';
 import { PolyLineDrawer } from './shapes/line/polyline.drawer';
+import { PolygonDrawer } from './shapes/polygon/polygon.drawer';
 import { RectangleDrawer } from './shapes/rectangle/rectangle.drawer';
 import { StateManager } from './state-manager';
-import { ShapeData, ShapeConfig, ShapeType, Shape } from './shapes';
-import { ShapeFactory } from './shape.factory';
-import { DrawrLog, logging } from './logging/logger';
-import { LayerService } from './layer.service';
 
 export class DrawingEditor {
   onLog?: (log: DrawrLog) => void;

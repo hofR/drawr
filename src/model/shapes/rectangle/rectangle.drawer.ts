@@ -1,6 +1,6 @@
 import Konva from 'konva';
-import { MoveDrawer } from '../../drawers/move-drawer';
 import { ShapeConfig, ShapeType } from '..';
+import { MoveDrawer } from '../../drawers/move-drawer';
 
 export class RectangleDrawer extends MoveDrawer<Konva.Rect> {
   override shapeType: ShapeType = 'RECTANGLE';

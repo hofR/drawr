@@ -1,8 +1,8 @@
 import Konva from 'konva';
-import { ShapeData } from './shape.data';
-import { ShapeConfig } from './shape.config';
-import { ShapeType } from './shape.type';
 import { Logger, logging } from '../logging/logger';
+import { ShapeConfig } from './shape.config';
+import { ShapeData } from './shape.data';
+import { ShapeType } from './shape.type';
 
 export interface ShapeState {
   selected: boolean;
