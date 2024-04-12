@@ -60,6 +60,11 @@ export class SelectionHandler {
     this.transformer.nodes(nodes);
   }
 
+  public addToSelection(...ids: string[]): void {
+    const nodes = this.layer.find((node: Konva.Node) => ids.includes(node.id()));
+    this.transformer.nodes().push(...nodes);
+  }
+
   protected handleMouseDown(mouseEvent: Konva.KonvaEventObject<MouseEvent>): void {
     // do nothing if we mousedown on any shape
     if (mouseEvent.target !== this.stage) {

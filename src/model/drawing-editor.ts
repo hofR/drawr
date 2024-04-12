@@ -10,7 +10,7 @@ import { Drawer } from './drawers/drawer';
 import { LayerService } from './layer.service';
 import { DrawrLog, logging } from './logging/logger';
 import { ShapeFactory } from './shape.factory';
-import { Shape, ShapeConfig, ShapeData, ShapeType } from './shapes';
+import { ShapeConfig, ShapeData, ShapeType } from './shapes';
 import { PolyLineDrawer } from './shapes/line/polyline.drawer';
 import { PolygonDrawer } from './shapes/polygon/polygon.drawer';
 import { RectangleDrawer } from './shapes/rectangle/rectangle.drawer';
@@ -237,10 +237,7 @@ export class DrawingEditor {
    * @returns Array of Shapes
    */
   public export(): ShapeData[] {
-    const shapes = this.layerService.getActiveLayer().findAll();
-    return shapes.map((shape) => {
-      return shape.toData();
-    });
+    return this.layerService.getActiveLayer().export();
   }
 
   /**
@@ -313,12 +310,7 @@ export class DrawingEditor {
    * @param ids of the shapes that should be updated
    */
   public updateShapeConfig(config: ShapeConfig, ...ids: string[]): void {
-    const shapes = this.layerService.getActiveLayer().findById(ids);
-    if (!shapes) {
-      return;
-    }
-
-    shapes.forEach((shape: Shape) => shape.updateConfig(config));
+    return this.layerService.getActiveLayer().updateShapeConfig(config, ...ids);
   }
 
   private createDirector(drawer: Drawer): DrawingDirector {

@@ -27,7 +27,7 @@ describe('remove', () => {
     collection.add(...shapes);
 
     const shapesToDelete = [shapes[2], shapes[4], shapes[8]];
-    collection.remove(...shapesToDelete);
+    collection.remove(shapesToDelete);
 
     const shapesAfterDelete = collection.get();
     expect(shapesAfterDelete).toBeDefined();
@@ -67,6 +67,17 @@ describe('filter', () => {
     expect(shapesFromCollection).toBeDefined();
     expect(shapesFromCollection.length).toBe(shapesFromArray.length);
     expect(shapesFromCollection[0].id).toBe(shapesFromArray[0].id);
+  });
+});
+
+describe('clear', () => {
+  it('removes all items', () => {
+    const shapeArray = createShapeArray();
+    collection.add(...shapeArray);
+    collection.clear();
+
+    const shapes = collection.get();
+    expect(shapes.length).toEqual(0);
   });
 });
 

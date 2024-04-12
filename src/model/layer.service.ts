@@ -2,6 +2,9 @@ import Konva from 'konva';
 import { SelectionHandler } from './selection-handler';
 import { LayerFacade } from './shapes/layer-facade';
 import { IdHelper } from './id-helper';
+import { ShapeService } from './shapes/shape.service';
+import { StateManager } from './state-manager';
+import { ShapeCollection } from './shapes/shape.collection';
 
 export class LayerService {
   private readonly layers: Record<string, LayerFacade> = {};
@@ -17,7 +20,11 @@ export class LayerService {
     });
     this.stage.add(layer);
 
-    const layerFacade = new LayerFacade(layer, new SelectionHandler(this.stage, layer));
+    const layerFacade = new LayerFacade(
+      layer,
+      new ShapeService(new StateManager(), new ShapeCollection()),
+      new SelectionHandler(this.stage, layer),
+    );
     this.layers[layer.id()] = layerFacade;
 
     if (isActive) {

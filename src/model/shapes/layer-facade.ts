@@ -3,29 +3,24 @@ import { logging } from '../logging/logger';
 import { SelectionHandler } from '../selection-handler';
 import { ShapeFactory } from '../shape.factory';
 import { Shape } from './shape';
-import { ShapeCollection } from './shape.collection';
-import { StateManager } from '../state-manager';
+import { ShapeConfig } from './shape.config';
+import { ShapeData } from './shape.data';
+import { ShapeService } from './shape.service';
 
 /**
  * Facade to encapsulate access to Konva.Layer
  */
 export class LayerFacade {
-  private readonly shapes = new ShapeCollection();
-  private readonly stateManager = new StateManager();
   private readonly logger = logging.createLogger('LayerFacade');
 
   constructor(
     private readonly layer: Konva.Layer,
+    private readonly shapeService: ShapeService,
     private readonly selectionHandler: SelectionHandler,
   ) {
     selectionHandler.onSelect = (selected) => {
       this.logger.debug('selectionHandler.onSelect: ' + selected);
       this.updateSelection(...selected);
-    };
-
-    this.shapes.onChange = (shapes) => {
-      this.logger.debug('shapes.onChange: ' + shapes);
-      this.saveState(shapes);
     };
   }
 
@@ -36,43 +31,34 @@ export class LayerFacade {
   add(...shapes: Konva.Shape[]) {
     this.logger.debug(`add ${shapes.map((s) => s.id())}`);
     this.layer.add(...shapes);
-    this.shapes.add(...shapes.map((shape) => this.createShape(shape)));
+    this.shapeService.add(...shapes.map((shape) => ShapeFactory.createShape(shape)));
   }
 
   remove(...ids: string[]): void {
     this.logger.debug(`delete ${ids}`);
-    const shapes = this.findById(ids);
-    this.deleteShapesAndRemove(...shapes);
+    this.shapeService.delete(...ids);
   }
 
   /**
    * Deletes all shapes that are currently selected
    */
   deleteSelected() {
-    const selected = this.findSelected();
+    this.logger.debug(`deleteSelected`);
     //this.selectionHandler?.updateSelectionById(...selected.map((shape) => shape.id));
-    this.deleteShapesAndRemove(...selected);
+    this.shapeService.deleteSelected();
   }
 
   /**
    * Deletes all shapes on the layer and resets active selections
    */
   clear(): void {
-    this.deleteShapesAndRemove(...this.shapes.get());
+    this.logger.debug('clear');
+    this.shapeService.clear();
     this.selectionHandler.clearSelection();
   }
 
-  private deleteShapesAndRemove(...shapes: Shape[]) {
-    shapes.forEach((shape) => shape.delete());
-    this.shapes.remove(...shapes);
-  }
-
   private updateSelection(...ids: string[]): void {
-    const selected = this.findById(ids);
-    const unselected = this.shapes.filter((shape) => !ids.includes(shape.id));
-
-    selected.forEach((shape) => shape.select());
-    unselected.forEach((shape) => shape.deselect());
+    this.shapeService.updateSelection(...ids);
   }
 
   /**
@@ -80,7 +66,7 @@ export class LayerFacade {
    */
   enableDrag(): void {
     this.logger.debug('enableDrag');
-    this.shapes.forEach((shape) => (shape.draggable = true));
+    this.shapeService.enableDrag();
   }
 
   /**
@@ -88,7 +74,7 @@ export class LayerFacade {
    */
   disableDrag(): void {
     this.logger.debug('disableDrag');
-    this.shapes.forEach((shape) => (shape.draggable = false));
+    this.shapeService.disableDrag();
   }
 
   /**
@@ -99,6 +85,10 @@ export class LayerFacade {
     this.selectionHandler?.setup();
   }
 
+  export(): ShapeData[] {
+    return this.shapeService.export();
+  }
+
   /**
    * Disables selection of shapes on the layer
    */
@@ -107,24 +97,8 @@ export class LayerFacade {
     this.selectionHandler?.dispose();
   }
 
-  findAll(): Shape[] {
-    this.logger.debug('findAll');
-    return this.shapes.get();
-  }
-
-  findSingleById(id: string): Shape | undefined {
-    this.logger.debug('findSingleById');
-    return this.shapes.find((shape) => shape.id === id);
-  }
-
-  findById(ids: string[]): Shape[] {
-    this.logger.debug('findById');
-    return this.shapes.filter((shape) => ids.includes(shape.id)) ?? [];
-  }
-
-  findSelected(): Shape[] {
-    this.logger.debug('findSelected');
-    return this.shapes.filter((shape) => shape.selected);
+  updateShapeConfig(config: ShapeConfig, ...ids: string[]): void {
+    this.shapeService.updateConfig(config, ...ids);
   }
 
   deactivate(): void {
@@ -149,18 +123,8 @@ export class LayerFacade {
     this.layer.destroy();
   }
 
-  private createShape(node: Konva.Node): Shape {
-    const shape = ShapeFactory.createShape(node);
-
-    shape.on('selectionChange', (event) => {
-      this.logger.debug('shape.onSelectionChange');
-      this.selectionHandler.updateSelectionById(...this.findSelected().map((shape) => shape.id));
-    });
-
-    return shape;
-  }
-
-  private saveState(shapes: Shape[]): void {
-    this.stateManager.save(shapes.map((shape) => shape.toData()));
+  select(...ids: string[]): void {
+    this.shapeService.select(...ids);
+    this.selectionHandler.addToSelection(...ids);
   }
 }

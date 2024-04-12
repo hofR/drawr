@@ -4,18 +4,6 @@ import { ShapeConfig } from './shape.config';
 import { ShapeData } from './shape.data';
 import { ShapeType } from './shape.type';
 
-export interface ShapeState {
-  selected: boolean;
-}
-
-export interface ShapeEvent {
-  shape: Shape;
-}
-
-interface ShapeEventMap {
-  selectionChange: CustomEvent<ShapeEvent>;
-}
-
 /**
  * Proxy object to encapsulate access to Konva.Shape outside of the library
  */
@@ -24,12 +12,8 @@ export abstract class Shape<KonvaShape extends Konva.Shape = Konva.Shape, Data e
   private isDestroyed = false;
   private logger: Logger;
 
-  constructor(
-    protected readonly shape: KonvaShape,
-    state?: ShapeState,
-  ) {
+  constructor(protected readonly shape: KonvaShape) {
     super();
-    this.isSelected = state?.selected ?? false;
     this.logger = logging.createLogger(this.id);
   }
 
@@ -105,12 +89,10 @@ export abstract class Shape<KonvaShape extends Konva.Shape = Konva.Shape, Data e
 
   select() {
     this.isSelected = true;
-    this.dispatchEvent(this.getEvent('selectionChange'));
   }
 
   deselect() {
     this.isSelected = false;
-    this.dispatchEvent(this.getEvent('selectionChange'));
   }
 
   delete(): void {
@@ -136,22 +118,10 @@ export abstract class Shape<KonvaShape extends Konva.Shape = Konva.Shape, Data e
     return this.mapToData();
   }
 
-  on<T extends keyof ShapeEventMap>(
-    type: T,
-    listener: (this: Shape, ev: ShapeEventMap[T]) => any,
-    options?: boolean | AddEventListenerOptions,
-  ): void {
-    this.addEventListener(type, listener as EventListener, options);
-  }
-
   protected shapeData: ShapeData = {
     type: this.type,
     fill: this.fill,
     stroke: this.stroke,
     strokeWidth: this.strokeWidth,
   };
-
-  private getEvent(type: keyof ShapeEventMap): CustomEvent {
-    return new CustomEvent(type, { detail: { shape: this } });
-  }
 }

@@ -1,10 +1,10 @@
 import Konva from 'konva';
-import { Shape, ShapeState } from '../shape';
+import { Shape } from '../shape';
 import { RectangleData } from './rectangle.data';
 
 export class Rectangle extends Shape<Konva.Rect, RectangleData> {
-  constructor(rectangle: Konva.Rect, state?: ShapeState) {
-    super(rectangle, state);
+  constructor(rectangle: Konva.Rect) {
+    super(rectangle);
   }
 
   override mapToData(): RectangleData {

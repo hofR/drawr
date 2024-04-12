@@ -2,67 +2,57 @@ import Konva from 'konva';
 import { LayerFacade } from './layer-facade';
 import { SelectionHandler } from '../selection-handler';
 import { createKonvaRect, createKonvaRects, createStage } from '../../testing/test.utils';
+import { ShapeService } from './shape.service';
+import { StateManager } from '../state-manager';
+import { ShapeCollection } from './shape.collection';
 jest.mock('../selection-handler');
+jest.mock('./shape.service');
 
 let layer: Konva.Layer;
 let facade: LayerFacade;
+const shapeService = new ShapeService(new StateManager(), new ShapeCollection());
+const selectionHandler = new SelectionHandler(createStage(), new Konva.Layer());
 
 beforeEach(() => {
   (SelectionHandler as jest.Mock).mockClear();
+  (ShapeService as jest.Mock).mockClear();
+
   layer = createLayer();
-  facade = new LayerFacade(layer, new SelectionHandler(createStage(), new Konva.Layer()));
+  facade = new LayerFacade(layer, shapeService, selectionHandler);
 });
 
-describe('add', () => {
-  it('creates a shape on the layer', () => {
+describe('LayerFacade', () => {
+  it('add creates a shape on the layer', () => {
     const id = 'rect';
     facade.add(createKonvaRect(id));
 
     const node = layer.find('#rect');
     expect(node).toBeDefined();
   });
-});
 
-describe('add and findAll', () => {
-  it('returns correct number of shapes', () => {
+  it('add with several shapes adds all shapes to layer', () => {
     const expectedCount = 2;
     const rects = createKonvaRects(expectedCount);
     facade.add(...rects);
 
-    const shapes = facade.findAll();
+    const shapes = layer.find((node: Konva.Node) => node.id().startsWith('rect'));
     expect(shapes).toBeDefined();
     expect(shapes.length).toBe(expectedCount);
   });
-});
 
-describe('select and findSelected', () => {
-  it('returns selected shape', () => {
-    const id = 'rect';
+  it('select calls ShapeService and SelectionHandler', () => {
     const rect = createKonvaRect('rect');
-    facade.add(rect);
+    facade.select(rect.id());
 
-    const shape = facade.findSingleById(id);
-    shape?.select();
-
-    const shapes = facade.findSelected();
-    expect(shapes.length).toBe(1);
-    expect(shapes[0].id).toBe(shape?.id);
+    expect(shapeService.select).toHaveBeenCalled();
+    expect(shapeService.select).toHaveBeenCalledWith(rect.id());
+    expect(selectionHandler.addToSelection).toHaveBeenCalled();
+    expect(selectionHandler.addToSelection).toHaveBeenCalledWith(rect.id());
   });
-});
 
-describe('deleteSelected', () => {
-  it('deletes only selected shapes', () => {
-    const rects = createKonvaRects(2);
-    facade.add(...rects);
-    const shapes = facade.findAll();
-    shapes[0].select();
-    const remainingShapeId = shapes[1].id;
-
+  it('deleteSelected calls ShapeService', () => {
     facade.deleteSelected();
-
-    const shapesAfterDelete = facade.findAll();
-    expect(shapesAfterDelete.length).toBe(1);
-    expect(shapesAfterDelete[0].id).toBe(remainingShapeId);
+    expect(shapeService.deleteSelected).toHaveBeenCalled();
   });
 });
 

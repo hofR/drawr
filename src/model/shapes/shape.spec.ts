@@ -78,35 +78,21 @@ describe('shape', () => {
   });
 
   it('select', () => {
-    let selectionChangeCount = 0;
-    shape.on('selectionChange', () => {
-      selectionChangeCount++;
-    });
-
     shape.select();
     expect(shape.selected).toEqual(true);
 
     shape.deselect();
     expect(shape.selected).toEqual(false);
-
-    expect(selectionChangeCount).toEqual(2);
   });
 
   it('delete', () => {
     shape.select();
 
-    let selectionChangeCount = 0;
-    shape.on('selectionChange', () => {
-      selectionChangeCount++;
-    });
-
     shape.delete();
-    expect(selectionChangeCount).toEqual(1);
     expect(shape.selected).toEqual(false);
 
     expect(() => shape.delete()).toThrow();
     expect(shape.selected).toEqual(false);
-    expect(selectionChangeCount).toEqual(1);
   });
 
   it('updateConfig', () => {
