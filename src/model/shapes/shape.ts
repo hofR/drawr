@@ -22,6 +22,7 @@ interface ShapeEventMap {
  */
 export abstract class Shape<KonvaShape extends Konva.Shape = Konva.Shape, Data extends ShapeData = ShapeData> extends EventTarget {
   private isSelected = false;
+  private isDestroyed = false;
   private logger: Logger;
 
   constructor(
@@ -103,10 +104,6 @@ export abstract class Shape<KonvaShape extends Konva.Shape = Konva.Shape, Data e
     return this.isSelected;
   }
 
-  set selected(selected: boolean) {
-    this.isSelected = selected;
-  }
-
   select() {
     this.isSelected = true;
     this.dispatchEvent(this.getEvent('selectionChange'));
@@ -119,9 +116,16 @@ export abstract class Shape<KonvaShape extends Konva.Shape = Konva.Shape, Data e
 
   delete(): void {
     this.logger.debug(`Destroying shape: ${this.id}`);
-    this.shape.destroy();
-    this.deselect();
-    this.dispatchEvent(this.getEvent('delete'));
+    if (this.isDestroyed) {
+      const message = `Shape ${this.id} was already deleted`;
+      this.logger.error(message);
+      throw new Error(message);
+    } else {
+      this.isDestroyed = true;
+      this.shape.destroy();
+      this.deselect();
+      this.dispatchEvent(this.getEvent('delete'));
+    }
   }
 
   updateConfig(config: ShapeConfig): void {

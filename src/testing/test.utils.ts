@@ -1,6 +1,7 @@
 import Konva from 'konva';
-import { ShapeConfig, ShapeType } from '../model/shapes';
+import { RectangleData, Shape, ShapeConfig, ShapeType } from '../model/shapes';
 import { DrawrLog, DrawrLogLevel, logging } from '../model/logging/logger';
+import { ShapeFactory } from '../model/shape.factory';
 
 export function createStage(): Konva.Stage {
   document.body.innerHTML = '<div id="container"></div>';
@@ -11,6 +12,21 @@ export function createStage(): Konva.Stage {
   });
 }
 
+export function createRectangle(): Shape {
+  const data: RectangleData = {
+    type: 'RECTANGLE',
+    fill: 'test',
+    stroke: 'test',
+    strokeWidth: 5,
+    x: 10,
+    y: 10,
+    width: 10,
+    height: 10,
+  };
+
+  return ShapeFactory.createShape(ShapeFactory.createKonvaShape(data));
+}
+
 export function createKonvaRects(count: number): Konva.Shape[] {
   const rects: Konva.Shape[] = [];
   for (let index = 0; index < count; index++) {
@@ -19,11 +35,12 @@ export function createKonvaRects(count: number): Konva.Shape[] {
   return rects;
 }
 
-export function createKonvaRect(id?: string): Konva.Rect {
+export function createKonvaRect(id?: string, config?: Konva.RectConfig): Konva.Rect {
   const type: ShapeType = 'RECTANGLE';
   return new Konva.Rect({
     id: id,
     name: type,
+    ...config,
   });
 }
 
