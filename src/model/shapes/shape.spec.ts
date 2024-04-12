@@ -95,18 +95,12 @@ describe('shape', () => {
   it('delete', () => {
     shape.select();
 
-    let deleteCount = 0;
-    shape.on('delete', () => {
-      deleteCount++;
-    });
-
     let selectionChangeCount = 0;
     shape.on('selectionChange', () => {
       selectionChangeCount++;
     });
 
     shape.delete();
-    expect(deleteCount).toEqual(1);
     expect(selectionChangeCount).toEqual(1);
     expect(shape.selected).toEqual(false);
 

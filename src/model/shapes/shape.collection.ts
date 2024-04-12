@@ -3,8 +3,11 @@ import { Shape } from './shape';
 export class ShapeCollection {
   private readonly shapes: Shape[] = [];
 
+  onChange?: (shapes: Shape[]) => void;
+
   add(...shapes: Shape[]): void {
     this.shapes.push(...shapes);
+    this.triggerOnChange();
   }
 
   get(): Shape[] {
@@ -28,5 +31,12 @@ export class ShapeCollection {
       const index = this.shapes.findIndex((shape) => shape.id === toRemove.id);
       this.shapes.splice(index, 1);
     });
+    this.triggerOnChange();
+  }
+
+  private triggerOnChange(): void {
+    if (this.onChange) {
+      this.onChange(this.shapes);
+    }
   }
 }

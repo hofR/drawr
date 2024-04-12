@@ -227,6 +227,10 @@ export class DrawingEditor {
     this.layerService.getActiveLayer().deleteSelected();
   }
 
+  deleteShapes(...ids: string[]): void {
+    this.layerService.getActiveLayer().remove(...ids);
+  }
+
   /**
    * Exports all rendered shapes
    *

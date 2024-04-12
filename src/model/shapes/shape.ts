@@ -13,7 +13,6 @@ export interface ShapeEvent {
 }
 
 interface ShapeEventMap {
-  delete: CustomEvent<ShapeEvent>;
   selectionChange: CustomEvent<ShapeEvent>;
 }
 
@@ -124,7 +123,6 @@ export abstract class Shape<KonvaShape extends Konva.Shape = Konva.Shape, Data e
       this.isDestroyed = true;
       this.shape.destroy();
       this.deselect();
-      this.dispatchEvent(this.getEvent('delete'));
     }
   }
 
